@@ -1,0 +1,31 @@
+* Python读写文件相关操作
+** 往文件中写入numpy array
+*** ~f.write()~
+以字符串形式将数据写入文件
+#+BEGIN_SRC python :results output
+import numpy as np
+a = np.ones((8, 3))
+print(a)
+with open('file1', 'w', encoding = 'utf8') as f:
+    f.write(str(a))
+#+END_SRC
+
+#+RESULTS:
+: [[1. 1. 1.]
+:  [1. 1. 1.]
+:  [1. 1. 1.]
+:  [1. 1. 1.]
+:  [1. 1. 1.]
+:  [1. 1. 1.]
+:  [1. 1. 1.]
+:  [1. 1. 1.]]
+
+*** ~np.savetxt()~
+numpy方法写入文件。
+#+BEGIN_SRC python :results output
+import numpy as np
+a = np.ones((8, 3))
+np.savetxt('filename', a, delimiter=',')
+#+END_SRC
+
+#+RESULTS:
