@@ -29,3 +29,20 @@ np.savetxt('filename', a, delimiter=',')
 #+END_SRC
 
 #+RESULTS:
+** 从文件中读取数据
+*** 用numpy的方法
+#+BEGIN_SRC python :results output
+import numpy as np
+a = np.loadtxt('filename', delimiter=',')
+print(a)
+#+END_SRC
+
+#+RESULTS:
+: [[1. 1. 1.]
+:  [1. 1. 1.]
+:  [1. 1. 1.]
+:  [1. 1. 1.]
+:  [1. 1. 1.]
+:  [1. 1. 1.]
+:  [1. 1. 1.]
+:  [1. 1. 1.]]
