@@ -29,11 +29,11 @@ device = torch.device('cpu', 0)
 *** 配置 CUDA 访问限制
 可以通过如下方式，设置当前 Python 脚本可见的 GPU.
 
-在终端设置:
+- 在终端设置:
 #+BEGIN_SRC python :results output
 CUDA_VISIBLE_DEVICES=1 python my_script.py
 #+END_SRC
-实例
+实例:
 
 #+BEGIN_SRC python :results output
 # Environment Variable Syntax    Results
@@ -43,19 +43,20 @@ CUDA_VISIBLE_DEVICES="0,1"       Same as above, quotation marks are optional
 CUDA_VISIBLE_DEVICES=0,2,3       Devices 0, 2, 3 will be visible; device 1 is masked
 CUDA_VISIBLE_DEVICES=""          No GPU will be visible
 #+END_SRC
-在 Python 代码中设置
+- 在 Python 代码中设置
 #+BEGIN_SRC python :results output
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "0, 2"
 #+END_SRC
-使用函数 set_device
+- 使用函数 set_device
 #+BEGIN_SRC python :results output
 import torch
 torch.cuda.set_device(id)
 #+END_SRC
 官方建议使用 CUDA_VISIBLE_DEVICES，不建议使用 set_device 函数。
 ** 单机单卡训练
-默认使用CPU训练模型，使用GPU时，模型和输入必须位于同一张GPU卡上。
+默认使用CPU训练模型，使用GPU单机单卡训练时，模型和输入必须位于同一张GPU卡上。
+
 使用GPU方法如下：
 #+BEGIN_SRC python :results output
 device = torch.device('cuda: 1')
@@ -64,4 +65,28 @@ model = model.to(device) # 必须指定device
 #+END_SRC
 
 ** 并行训练
-见词条：[[https://github.com/tczhangzhi/pytorch-distributed]]
+参考词条：[[https://github.com/tczhangzhi/pytorch-distributed]]
+
+*** 简单的方便 ~nn.DataParallel~ [不推荐使用，distributed更高效！]
+需要用 ~torch..nn.DataParallel~ 来包装模型，包装模型时需要设置一些参数，包括：
+参与训练的GPU有哪些， ~device_id~ ;用于汇总梯度的GPU是哪个， ~output_device~ 。
+~nn.DataParallel~ 会自动将数据切分load到相应GPU，进行正向传播，并计算梯度：
+#+BEGIN_SRC python
+import torch.nn as nn
+
+model = MyNet()
+model = model.cuda() # 需要这一步吗？
+net = nn.DataParallel(
+                      model, # 要被并行化的模块
+                      device_ids=[0, 1, 2], # 整数列表或torch.device类型，默认值为所有的CUDA device
+                      output_device=0 # 输出的device位置，默认值为device_ids[0]
+                      )
+output = net(input_var) # input_var可以在任何device上，包括CPU上。新的变动？
+#+END_SRC
+
+
+#+BEGIN_EXAMPLE
+注意：
+  1. 是否需要手动将输入数据移动到GPU上？
+  2. 是否需要 model.to(device)？
+#+END_EXAMPLE
