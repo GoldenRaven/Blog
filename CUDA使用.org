@@ -68,9 +68,10 @@ model = model.to(device) # 必须指定device
 参考词条：[[https://github.com/tczhangzhi/pytorch-distributed]]
 
 *** 简单的方便 ~nn.DataParallel~ [不推荐使用，distributed更高效！]
-需要用 ~torch..nn.DataParallel~ 来包装模型，包装模型时需要设置一些参数，包括：
-参与训练的GPU有哪些， ~device_id~ ;用于汇总梯度的GPU是哪个， ~output_device~ 。
-~nn.DataParallel~ 会自动将数据切分load到相应GPU，进行正向传播，并计算梯度：
+需要用 ~torch.nn.DataParallel~ 来包装模型，包装模型时需要设置一些参数，包括：
+参与训练的GPU有哪些， ~device_ids~ ;用于汇总梯度的GPU是哪个， ~output_device~ 。
+~nn.DataParallel~ 会自动将数据切分load到相应GPU，进行正向传播，并计算梯度，所以
+batch_size应设置为 ~单个GPU上的batch_size * 使用的GPU个数~ ：
 #+BEGIN_SRC python
 import torch.nn as nn
 
