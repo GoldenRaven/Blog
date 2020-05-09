@@ -10,3 +10,56 @@ print(torch.cuda.current_device()) # 返回当前设备索引
 #+END_SRC
 
 #+RESULTS:
+*** torch.device
+torch.device 表示 torch.Tensor 分配到的设备的对象。其包含一个设备类型
+（cpu 或 cuda），以及可选的设备序号。
+可以通过如下方式创建 torch.device 对象：
+#+BEGIN_SRC python :results output
+# 通过字符串
+device = torch.device('cpu')
+device = torch.device('cuda:1')  # 指定类型及编号。注意，代码不会检查编号是否合法
+device = torch.device('cuda')    # 默认为当前设备
+#+END_SRC
+还可以通过设备类型加上编号，来创建 device 对象：
+#+BEGIN_SRC python :results output
+device = torch.device('cuda', 0)
+device = torch.device('cpu', 0)
+#+END_SRC
+
+*** 配置 CUDA 访问限制
+可以通过如下方式，设置当前 Python 脚本可见的 GPU.
+
+在终端设置:
+#+BEGIN_SRC python :results output
+CUDA_VISIBLE_DEVICES=1 python my_script.py
+#+END_SRC
+实例
+
+#+BEGIN_SRC python :results output
+# Environment Variable Syntax    Results
+CUDA_VISIBLE_DEVICES=1           Only device 1 will be seen
+CUDA_VISIBLE_DEVICES=0,1         Devices 0 and 1 will be visible
+CUDA_VISIBLE_DEVICES="0,1"       Same as above, quotation marks are optional
+CUDA_VISIBLE_DEVICES=0,2,3       Devices 0, 2, 3 will be visible; device 1 is masked
+CUDA_VISIBLE_DEVICES=""          No GPU will be visible
+#+END_SRC
+在 Python 代码中设置
+#+BEGIN_SRC python :results output
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "0, 2"
+#+END_SRC
+使用函数 set_device
+#+BEGIN_SRC python :results output
+import torch
+torch.cuda.set_device(id)
+#+END_SRC
+官方建议使用 CUDA_VISIBLE_DEVICES，不建议使用 set_device 函数。
+** 单机单卡训练
+默认使用CPU训练模型，使用GPU时，模型和输入必须位于同一张GPU卡上。
+使用GPU方法如下：
+#+BEGIN_SRC python :results output
+device = torch.device('cuda: 1')
+model = model.cuda(device)
+model = model.to(device) # 必须指定device
+#+END_SRC
+
