@@ -63,3 +63,5 @@ model = model.cuda(device)
 model = model.to(device) # 必须指定device
 #+END_SRC
 
+** 并行训练
+见词条：[[https://github.com/tczhangzhi/pytorch-distributed]]
