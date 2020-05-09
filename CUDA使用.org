@@ -85,9 +85,76 @@ net = nn.DataParallel(
 output = net(input_var) # input_var可以在任何device上，包括CPU上。新的变动？
 #+END_SRC
 
-
 #+BEGIN_EXAMPLE
 注意：
   1. 是否需要手动将输入数据移动到GPU上？
   2. 是否需要 model.to(device)？
 #+END_EXAMPLE
+
+由单进程控制多个GPU。
+*** ~torch.distributed~ 并行
+有了distributed之后，我们可以只写一份代码，torch会自动将其分配给n个进程，分别在n个进程
+上运行。
+
+pytorch为我们提供了torch.distributed.lanch启动器，用于在命令行分布式的执行Python
+文件。可以这样获得当前进程（也即GPU的）的index:
+#+BEGIN_SRC python
+parser = ArgumentParse()
+parser.add_argument('__local_rank', default=-1, type=int,
+                    help='node rank for distributed training')
+args = parse.parse_args()
+
+print(args.local_rank)
+#+END_SRC
+
+然后使用 ~init_process_group~ 设置GPU通信所作用的后端和端口。初始化进程组主要有三种
+方法：
+- 显式指定 ~store~  ~rank~  ~word_size~
+- 指定 ~init_method~ ，来告诉进程如何去发现其他并行进程（ ~init_method~ 是个URL
+  字符串），并且指定 ~rank~ 和 ~word_size~ 或将它们写入URL字符串中。
+- 如果以上两种都没有指定，则假设 ~init_method~ 为 ~env://~
+#+BEGIN_SRC python
+import torch.distributed as dist
+parser.add_argument('--dist-url', default='tcp://127.0.0.1:3456', type=str, help='')
+dist.init_process_group(backend='nccl', # nccl的GPU支持目前是最好的，推荐使用
+                        init_method=args.dist_url, # 字符串
+                        world_size= ， # 整数，可选，任务的进程数。如果store给定，则必须指定
+                        rank= , # 当前进程的rank, 如果store给定，则必须指定
+                        store=  #
+                       )
+#+END_SRC
+
+然后，使用DistributedSampler对数据集进行划分
+#+BEGIN_SRC python
+train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
+train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=..., sampler=train_sampler)
+#+END_SRC
+
+然后，使用 DistributedDataParallel 包装模型
+#+BEGIN_SRC python
+model = torch.nn.parallel.DistributedDataParallel(model,
+                                                  device_ids=[args.local_rank])
+#+END_SRC
+
+最后把数据和模型加载到当前进程使用的GPU中，进行向前向后传播：
+#+BEGIN_SRC python
+torch.cuda.set_device(args.local_rank)
+model.cuda()
+
+for epoch in range(100):
+   for batch_idx, (data, target) in enumerate(train_loader):
+      images = images.cuda(non_blocking=True)
+      target = target.cuda(non_blocking=True)
+      # ...
+      output = model(images)
+      loss = criterion(output, target)
+      # ...
+      optimizer.zero_grad()
+      loss.backward()
+      optimizer.step()
+#+END_SRC
+
+在使用时，调用 torch.distributed.launch 启动器启动：
+#+BEGIN_SRC shell
+CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node=4 main.py
+#+END_SRC
