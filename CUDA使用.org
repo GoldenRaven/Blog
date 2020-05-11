@@ -100,7 +100,7 @@ pytorch为我们提供了torch.distributed.lanch启动器，用于在命令行�
 文件。可以这样获得当前进程（也即GPU的）的index:
 #+BEGIN_SRC python
 parser = ArgumentParse()
-parser.add_argument('__local_rank', default=-1, type=int,
+parser.add_argument('--local_rank', default=-1, type=int,
                     help='node rank for distributed training')
 args = parse.parse_args()
 
@@ -115,12 +115,11 @@ print(args.local_rank)
 - 如果以上两种都没有指定，则假设 ~init_method~ 为 ~env://~
 #+BEGIN_SRC python
 import torch.distributed as dist
-parser.add_argument('--dist-url', default='tcp://127.0.0.1:3456', type=str, help='')
 dist.init_process_group(backend='nccl', # nccl的GPU支持目前是最好的，推荐使用
-                        init_method=args.dist_url, # 字符串
-                        world_size= ， # 整数，可选，任务的进程数。如果store给定，则必须指定
-                        rank= , # 当前进程的rank, 如果store给定，则必须指定
-                        store=  #
+                        init_method='env://'
+                        #world_size= ， # 整数，可选，任务的进程数。如果store给定，则必须指定
+                        #rank= , # 当前进程的rank, 如果store给定，则必须指定
+                        #store=  #
                        )
 #+END_SRC
 
@@ -183,3 +182,14 @@ dist.init_process_group(backend='nccl', init_method='tcp://127.0.0.1:23456', wor
 #+BEGIN_SRC python
 python main.py
 #+END_SRC
+*** 使用建议
+强烈建议用该方式来使用 DistributedDataParallel，使用多进程，每个进程使用一个 GPU。
+这是目前 Pytorch 中，无论是单节点还是多节点，进行数据并行训练最快的方式。
+在单节点多 GPU 上进行训练，该方式比 torch.nn.DataParallel 更快。这是因为分布是并行不需要 broadcast 参数。
+
+假设每个主机有 N 个 GPUs，那么需要使用 N 个进程，并保证每个进程单独处理一个 GPU。
+为了在每个主机（node）上使用多进程，可以使用 torch.distributed.launch
+或 torch.multiprocessing.spawn 来实现。
+
+在 DataParallel 中，batch size 设置必须为单卡的 n 倍，但是在 DistributedDataParallel
+内，batch size 设置于单卡一样即可。
