@@ -233,4 +233,12 @@ dist.init_process_group(backend='nccl', # nccl的GPU支持目前是最好的，�
 不同步，从而卡进程，不能正常结束任务。
 
 在 DataParallel 中，batch size 设置必须为单卡的 n 倍，但是在 DistributedDataParallel
-内，batch size 设置于单卡一样即可。
+内，batch size 设置于单卡一样即可。可见代码中设置的均为单个GPU所使用的batch size。
+
+使用方法：
+#+BEGIN_SRC shell
+#on master node
+python mnist-distributed.py -n 2 -g 4 --nr 0 --epoch 30
+#on node 1
+python mnist-distributed.py -n 2 -g 4 --nr 0 --epoch 30
+#+END_SRC
