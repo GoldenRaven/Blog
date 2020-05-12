@@ -65,9 +65,8 @@ model = model.to(device) # 必须指定device
 #+END_SRC
 
 ** 并行训练
-参考词条：[[https://github.com/tczhangzhi/pytorch-distributed]]
 
-*** 简单的方便 ~nn.DataParallel~ [不推荐使用，distributed更高效！]
+*** 简单方便的 ~nn.DataParallel~ [不推荐使用，distributed更高效！]
 需要用 ~torch.nn.DataParallel~ 来包装模型，包装模型时需要设置一些参数，包括：
 参与训练的GPU有哪些， ~device_ids~ ;用于汇总梯度的GPU是哪个， ~output_device~ 。
 ~nn.DataParallel~ 会自动将数据切分load到相应GPU，进行正向传播，并计算梯度，所以
@@ -85,15 +84,16 @@ net = nn.DataParallel(
 output = net(input_var) # input_var可以在任何device上，包括CPU上。新的变动？
 #+END_SRC
 
-#+BEGIN_EXAMPLE
 注意：
-  1. 是否需要手动将输入数据移动到GPU上？
-  2. 是否需要 model.to(device)？
-#+END_EXAMPLE
+  - +是否需要手动将输入数据移动到GPU上？+ 需要！
+  - +是否需要 model.to(device)？+ 需要！
 
-由单进程控制多个GPU。
+由单进程控制多个GPU，所以在一个节点上只需要运行一次就可以创建一个进程。
 *** ~torch.distributed~ 并行
-有了distributed之后，我们可以只写一份代码，torch会自动将其分配给n个进程，分别在n个进程
+上面的DataParallel进行数据并行时，使用一个进程来使用单个或多个GPU，若要创建多个进程就
+需要代码并运行多次，很不方便。
+
+有了distributed之后，我们可以只写一份代码，torch会自动将其分配给n个进程，分别在n个GPU
 上运行。
 
 pytorch为我们提供了torch.distributed.lanch启动器，用于在命令行分布式的执行Python
@@ -126,7 +126,9 @@ dist.init_process_group(backend='nccl', # nccl的GPU支持目前是最好的，�
 然后，使用DistributedSampler对数据集进行划分
 #+BEGIN_SRC python
 train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
-train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=..., sampler=train_sampler)
+train_loader = torch.utils.data.DataLoader(train_dataset,
+                                           batch_size=...,
+                                           sampler=train_sampler)
 #+END_SRC
 
 然后，使用 DistributedDataParallel 包装模型
@@ -158,7 +160,9 @@ for epoch in range(100):
 CUDA_VISIBLE_DEVICES=0,1,2,3 python -m torch.distributed.launch --nproc_per_node=4 main.py
 #+END_SRC
 *** 使用 ~torch.multiprocessing~ 取代启动器
-spawn 开启了 nprocs=4 个线程，每个线程执行 main_worker 并向其中传入 local_rank和args（即 4 和 myargs）作为参数：
+上面的launch使用过于繁琐，可以用更方便的 ~torch.multiprocessing~ 取代启动器。
+下面的spawn 开启了 nprocs=4 个线程，每个线程执行 main_worker 并向其中传入
+local_rank和args（即 4 和 myargs）作为参数：
 #+BEGIN_SRC python
 import multiprocessing as mp
 mp.spawn(main_worker, nprocs=4, args=(4,myargs))
@@ -182,6 +186,40 @@ dist.init_process_group(backend='nccl', init_method='tcp://127.0.0.1:23456', wor
 #+BEGIN_SRC python
 python main.py
 #+END_SRC
+
+*** 应该选择哪一种并行后端？
+其中backend为并行使用的后端，目前可选的有NCCL, Gloo, MPI. 对CPU和GPU的支持如下图：
+
+[[file:images/pytorch_backends.png]]
+
+目前Pytorch的 ~distributed~ 仅支持Linux平台。Gloo被包含在Pytorch安装文件中，NCCL则
+在安装CUDA时被包含在内，而使用MPI则需要在用源码安装Pytorch时打开MPI支持。
+
+如何选择后端：
+- 分布式GPU训练：用NCCL。
+- 分布式CPU训练：用Gloo。
+- 用InfiniBand互连的GPU节点：用NCCL。只有NCCL支持IfiniBand和GPUDirect
+- 用以太网互连的GPU节点：用NCCL，因为它的性能最佳。如果NCCL不能使用，再考虑Gloo。目前
+  Gloo后端比NCCL要慢。
+- 用InfiniBand互连的CPU节点：如果InfiniBand可以使用IP，使用Gloo，否则使用MPI。
+  正在计划在未来版本中添加Gloo对InfiniBand的支持（时间点<2020-05-12 Tue>）。
+- 用以太网互连的CPU节点：除非你有使用MPI的特殊理由，否则使用Gloo。
+*** 并行后端的初始化
+使用 ~init_process_group~ 设置GPU通信所作用的后端和端口。初始化进程组主要有三种方法：
+- 显式指定 ~store~  ~rank~  ~word_size~
+- 指定 ~init_method~ ，来告诉进程如何去发现其他并行进程（ ~init_method~ 是个URL
+  字符串），并且指定 ~rank~ 和 ~word_size~ 或将它们写入URL字符串中。
+- 如果以上两种都没有指定，则假设 ~init_method~ 为 ~env://~
+#+BEGIN_SRC python
+import torch.distributed as dist
+dist.init_process_group(backend='nccl', # nccl的GPU支持目前是最好的，推荐使用
+                        init_method='env://'
+                        #world_size= ， # 整数，可选，任务的进程数。如果store给定，则必须指定
+                        #rank= , # 当前进程的rank, 如果store给定，则必须指定
+                        #store=  #
+                       )
+#+END_SRC
+
 *** 使用建议
 强烈建议用该方式来使用 DistributedDataParallel，使用多进程，每个进程使用一个 GPU。
 这是目前 Pytorch 中，无论是单节点还是多节点，进行数据并行训练最快的方式。
@@ -190,6 +228,9 @@ python main.py
 假设每个主机有 N 个 GPUs，那么需要使用 N 个进程，并保证每个进程单独处理一个 GPU。
 为了在每个主机（node）上使用多进程，可以使用 torch.distributed.launch
 或 torch.multiprocessing.spawn 来实现。
+
+在将数据移动到GPU上时，要将 ~non_blocking~ 设置为 ~False~ ，否则会导致不同GPU之间
+不同步，从而卡进程，不能正常结束任务。
 
 在 DataParallel 中，batch size 设置必须为单卡的 n 倍，但是在 DistributedDataParallel
 内，batch size 设置于单卡一样即可。
