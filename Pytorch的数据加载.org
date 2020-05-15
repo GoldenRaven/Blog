@@ -1,0 +1,13 @@
+* Pytorch的数据加载
+Pytorch中数据读取主要有三个类：
+- Dataset类
+- DataLoader类
+- DataLoaderIter类
+三者的关系：前者被装进后者。
+** ~torch.utils.data.Dataset~ 类
+~torch.utils.data.Dataset~ 是一个抽象类，自定义的Dataset要继承它，
+并实现两个成员方法： ~__get_item__()~, ~__len__()~ .第一个最重要，
+它决定了每次怎么读取数据。以自定义的MNIST数据集为例：
+#+BEGIN_SRC python
+#+END_SRC
+** DataLoader类
