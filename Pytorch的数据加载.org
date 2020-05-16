@@ -42,55 +42,33 @@ testset = MNIST_data('/home/ligy/Documents/handson_ML_practice/datasets/MNIST/te
                        transform = transform
                      )
 #+END_SRC
+
 ** ~torch.utils.data.DataLoader~ 类
-Combines a dataset and a sampler, and provides an iterable over the given dataset.
+将数据集和抽样器组合了起来，提供了一个数据集的可迭代对象。
 
-The class ~torch.utils.data.DataLoader~ supports both map-style and
-iterable-style datasets with single- or multi-process loading, customizing
-loading order and optional automatic batching (collation) and memory pinning.
-
-Arguments:
-    - dataset (Dataset): dataset from which to load the data.
-    - batch_size (int, optional): how many samples per batch to load
-         (default: ``1``).
-    - shuffle (bool, optional): set to ``True`` to have the data reshuffled
-         at every epoch (default: ``False``).
-    - sampler (Sampler, optional): defines the strategy to draw samples from
-         the dataset. If specified, :attr:`shuffle` must be ``False``.
-    - batch_sampler (Sampler, optional): like :attr:`sampler`, but returns a batch of
-         indices at a time. Mutually exclusive with :attr:`batch_size`,
-         :attr:`shuffle`, :attr:`sampler`, and :attr:`drop_last`.
-    - num_workers (int, optional): how many subprocesses to use for data
-         loading. ``0`` means that the data will be loaded in the main process.
-         (default: ``0``)
-    - collate_fn (callable, optional): merges a list of samples to form a
-         mini-batch of Tensor(s).  Used when using batched loading from a
-         map-style dataset.
-    - pin_memory (bool, optional): If ``True``, the data loader will copy Tensors
-         into CUDA pinned memory before returning them.  If your data elements
-         are a custom type, or your :attr:`collate_fn` returns a batch that is a custom type,
-         see the example below.
-    - drop_last (bool, optional): set to ``True`` to drop the last incomplete batch,
-         if the dataset size is not divisible by the batch size. If ``False`` and
-         the size of dataset is not divisible by the batch size, then the last batch
-         will be smaller. (default: ``False``)
-    - timeout (numeric, optional): if positive, the timeout value for collecting a batch
-         from workers. Should always be non-negative. (default: ``0``)
-    - worker_init_fn (callable, optional): If not ``None``, this will be called on each
-         worker subprocess with the worker id (an int in ``[0, num_workers - 1]``) as
-         input, after seeding and before data loading. (default: ``None``)
- 
- 
-    - warning: If the ``spawn`` start method is used, :attr:`worker_init_fn`
-              cannot be an unpicklable object, e.g., a lambda function. See
-              :ref:`multiprocessing-best-practices` on more details related
-              to multiprocessing in PyTorch.
- 
-    - note:: ``len(dataloader)`` heuristic is based on the length of the sampler used.
-          When :attr:`dataset` is an :class:`~torch.utils.data.IterableDataset`,
-          ``len(dataset)`` (if implemented) is returned instead, regardless
-          of multi-process loading configurations, because PyTorch trust
-          user :attr:`dataset` code in correctly handling multi-process
-          loading to avoid duplicate data. See `Dataset Types`_ for more
-          details on these two types of datasets and how
-          :class:`~torch.utils.data.IterableDataset` interacts with `Multi-process data loading`_.
+#+BEGIN_SRC python
+torch.utils.data.DataLoader(dataset,
+                            batch_size=1,
+                            shuffle=False,
+                            sampler=None,
+                            batch_sampler=None,
+                            num_workers=0,
+                            collate_fn=<function default_collate>,
+                            pin_memory=False,
+                            drop_last=False)
+#+END_SRC
+参数:
+    - dataset (Dataset): 用以加载数据的数据集
+    - batch_size (int, optional): 每个batch加载的样本数量，默认为1。
+    - shuffle (bool, optional): ~True~ 时第个epoch将再次打乱样本顺序，默认为 ~False~
+    - sampler (Sampler, optional): 定义了从数据集中抽样的策略。如果指定，shuffle必须为False
+    - batch_sampler (Sampler, optional): 与sampler类似，但每次返回一批样本指标，
+      与batch_size，shuffle, sampler, drop_last相互排斥。
+    - num_workers (int, optional): 加载时使用多少子线程。0代表数据会被加载进主进程。默认值为0。
+    - collate_fn (callable, optional): 将样本列表合并成一个mini-batch的形式。用于从map-style的
+      数据集中批量加载数据时。
+    - pin_memory (bool, optional):如果为True, 数据加载器将在返回张量前将他们复制到CUDA的pinned memory中。
+    - drop_last (bool, optional): 如果为True, 将丢掉最后一个不完整的批次（如果数据集大小不能被batch_size整除的话）。
+      默认为False.
+    - timeout (numeric, optional): 如果为正数，给定从worker收集批次的时间上限。非负，默认为0.
+    - worker_init_fn (callable, optional): 默认值为None.
