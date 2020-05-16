@@ -72,3 +72,28 @@ torch.utils.data.DataLoader(dataset,
       默认为False.
     - timeout (numeric, optional): 如果为正数，给定从worker收集批次的时间上限。非负，默认为0.
     - worker_init_fn (callable, optional): 默认值为None.
+可以这样来构造一个可迭代对象：
+#+BEGIN_SRC python
+trainset_loader = DataLoader(trainset, batch_size = 100)
+testset_loader = DataLoader(testset, batch_size = 100)
+#+END_SRC
+** 分布式计算时的数据加载
+trainset和testset的定义与之前相同，在定义DataLoader时要指定sampler
+用于分布式抽样。
+#+BEGIN_SRC python
+is_distributed = True
+trainset = # ...
+train_sampler = torch.utils.data.distributed.DistributedSampler(trainset, # 数据集
+                                                                num_replicas=args.world_size, # 参与分布式计算的线程数
+                                                                rank=rank,  # 当前线程在所有线程中的排序
+                                                                shuffle=True # 乱序，默认为True
+                                                                ) if is_distributed else None
+train_loader = torch.utils.data.DataLoader(dataset=trainset,
+                                           batch_size=batch_size,
+                                           shuffle=(sampler is None),
+                                           sampler=train_sampler,
+                                           num_workers=0,
+                                           pin_memory=True
+                                           )
+#+END_SRC
+
