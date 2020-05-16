@@ -9,5 +9,88 @@ Pytorch中数据读取主要有三个类：
 并实现两个成员方法： ~__get_item__()~, ~__len__()~ .第一个最重要，
 它决定了每次怎么读取数据。以自定义的MNIST数据集为例：
 #+BEGIN_SRC python
+from torch.utils.data import Dataset
+import pandas as pd
+
+class MNIST_dataset(Dataset):
+    """customized MNIST data set"""
+    def __init__(self, file_path='~/data/', header=None, transform=None):
+        df = pd.csv(file_path, header=header, dtype='uint8') # 必须要指定数据类型，也可以是np.float32
+        self.data = df.iloc[:, 1:].values.reshape(-1, 28, 28)
+        self.label = df.iloc[:, 0].values
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.data)
+
+    def __get_item__(self, idx):
+        data = self.data
+        if self.transform is not None:
+            data = self.transform(data)
+        return data[idx], self.label[idx]
 #+END_SRC
-** DataLoader类
+实例化数据类：
+#+BEGIN_SRC python
+# 定义数据变换
+transform = transforms.Compose([transforms.ToTensor(),
+                                transforms.Normalize((0.1307,), (0.3081,)) # MNIST数据集特有的均值和方差
+                               ])
+# 实例化数据集类
+trainset = MNIST_data('/home/ligy/Documents/handson_ML_practice/datasets/MNIST/train.csv', 
+                       transform = transform)
+testset = MNIST_data('/home/ligy/Documents/handson_ML_practice/datasets/MNIST/test.csv', 
+                       transform = transform
+                     )
+#+END_SRC
+** ~torch.utils.data.DataLoader~ 类
+Combines a dataset and a sampler, and provides an iterable over the given dataset.
+
+The class ~torch.utils.data.DataLoader~ supports both map-style and
+iterable-style datasets with single- or multi-process loading, customizing
+loading order and optional automatic batching (collation) and memory pinning.
+
+Arguments:
+    - dataset (Dataset): dataset from which to load the data.
+    - batch_size (int, optional): how many samples per batch to load
+         (default: ``1``).
+    - shuffle (bool, optional): set to ``True`` to have the data reshuffled
+         at every epoch (default: ``False``).
+    - sampler (Sampler, optional): defines the strategy to draw samples from
+         the dataset. If specified, :attr:`shuffle` must be ``False``.
+    - batch_sampler (Sampler, optional): like :attr:`sampler`, but returns a batch of
+         indices at a time. Mutually exclusive with :attr:`batch_size`,
+         :attr:`shuffle`, :attr:`sampler`, and :attr:`drop_last`.
+    - num_workers (int, optional): how many subprocesses to use for data
+         loading. ``0`` means that the data will be loaded in the main process.
+         (default: ``0``)
+    - collate_fn (callable, optional): merges a list of samples to form a
+         mini-batch of Tensor(s).  Used when using batched loading from a
+         map-style dataset.
+    - pin_memory (bool, optional): If ``True``, the data loader will copy Tensors
+         into CUDA pinned memory before returning them.  If your data elements
+         are a custom type, or your :attr:`collate_fn` returns a batch that is a custom type,
+         see the example below.
+    - drop_last (bool, optional): set to ``True`` to drop the last incomplete batch,
+         if the dataset size is not divisible by the batch size. If ``False`` and
+         the size of dataset is not divisible by the batch size, then the last batch
+         will be smaller. (default: ``False``)
+    - timeout (numeric, optional): if positive, the timeout value for collecting a batch
+         from workers. Should always be non-negative. (default: ``0``)
+    - worker_init_fn (callable, optional): If not ``None``, this will be called on each
+         worker subprocess with the worker id (an int in ``[0, num_workers - 1]``) as
+         input, after seeding and before data loading. (default: ``None``)
+ 
+ 
+    - warning: If the ``spawn`` start method is used, :attr:`worker_init_fn`
+              cannot be an unpicklable object, e.g., a lambda function. See
+              :ref:`multiprocessing-best-practices` on more details related
+              to multiprocessing in PyTorch.
+ 
+    - note:: ``len(dataloader)`` heuristic is based on the length of the sampler used.
+          When :attr:`dataset` is an :class:`~torch.utils.data.IterableDataset`,
+          ``len(dataset)`` (if implemented) is returned instead, regardless
+          of multi-process loading configurations, because PyTorch trust
+          user :attr:`dataset` code in correctly handling multi-process
+          loading to avoid duplicate data. See `Dataset Types`_ for more
+          details on these two types of datasets and how
+          :class:`~torch.utils.data.IterableDataset` interacts with `Multi-process data loading`_.
