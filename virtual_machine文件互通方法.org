@@ -1,0 +1,29 @@
+* 如何实现virtualbox下host机和guest机之间的文件互通？
+目前我知道的有两种方法：
+- 共享文件夹
+- ssh连接，或scp传输
+** 共享文件夹
+- 先在host机的virtualbox软件中设置要共享的host机中的文件目录
+- 再在guest机新建目录/mnt/shares来作为host机共享文件目录的挂载点
+- 在guest机中运行以下命令来挂载，并有读写权限
+#+BEGIN_SRC shell
+sudo mount -t vboxsf -o umask=0022,gid=985,uid=1000 /home/ligy/Public /mnt/shares
+#+END_SRC
+这样，host机 ~/home/ligy/Public~ 中的文件就会出现在guest机的 ~/mnt/shares~ 中，反之亦然。
+** 从host机ssh到guest机
+另一种方法是直接建立ssh通道，来复制文件。
+
+首先，在virtualbox的虚拟机网络选项中设置:
+- 连接方式：网络地址转换（NAT）
+- 高级：接入网线
+- 端口转发：
+  + 名称：ssh
+  + 协议：TCP
+  + 主机IP：无
+  + 主机端口：2201（可随意）
+  + 子系统IP：无
+  + 子系统端口：22
+设置完成后开启虚拟系统，即可连接。在host系统中可以用以下方式连接到guest系统：
+#+BEGIN_SRC shell
+ssh -p 2201 ligy@localhost
+#+END_SRC
