@@ -187,8 +187,8 @@ dist.init_process_group(backend='nccl', init_method='tcp://127.0.0.1:23456', wor
 python main.py
 #+END_SRC
 
-*** 应该选择哪一种并行后端？
-其中backend为并行使用的后端，目前可选的有NCCL, Gloo, MPI. 对CPU和GPU的支持如下图：
+*** 应该选择哪一种信息交换后端？
+其中backend为并行时GPU信息交换使用的后端，目前可选的有NCCL, Gloo, MPI. 对CPU和GPU的支持如下图：
 
 [[file:images/pytorch_backends.png]]
 
