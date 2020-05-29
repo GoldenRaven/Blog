@@ -253,3 +253,10 @@ python mnist-distributed.py -n 2 -g 4 --nr 0 --epoch 30
 - 可选的方法：validation_step, validation_end, test_step, test_end, val_dataloader
   test_dataloader, on_save_checkpoint, on_load_checkpoint, update_tng_log_metrics,
   add_model_specific_args
+
+** horovod
+[[https://github.com/horovod/horovod]]
+
+[[https://horovod.readthedocs.io/en/stable/pytorch.html]]
+
+[[https://jdhao.github.io/2019/11/01/pytorch_distributed_training/]]
