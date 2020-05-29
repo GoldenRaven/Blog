@@ -1,4 +1,4 @@
-* CUDA使用
+* 在GPU上的分布式训练
 ** CUDA基本使用
 *** 查看GPU信息
 #+BEGIN_SRC python :results output
@@ -54,7 +54,7 @@ import torch
 torch.cuda.set_device(id)
 #+END_SRC
 官方建议使用 CUDA_VISIBLE_DEVICES，不建议使用 set_device 函数。
-** 单机单卡训练
+*** 单机单卡训练
 默认使用CPU训练模型，使用GPU单机单卡训练时，模型和输入必须位于同一张GPU卡上。
 
 使用GPU方法如下：
@@ -64,8 +64,7 @@ model = model.cuda(device)
 model = model.to(device) # 必须指定device
 #+END_SRC
 
-** 并行训练
-
+** 使用pytorch内置的 ~torch.nn.parallel.DistributedDataParallel~ 来并行
 *** 简单方便的 ~nn.DataParallel~ [不推荐使用，distributed更高效！]
 需要用 ~torch.nn.DataParallel~ 来包装模型，包装模型时需要设置一些参数，包括：
 参与训练的GPU有哪些， ~device_ids~ ;用于汇总梯度的GPU是哪个， ~output_device~ 。
@@ -89,7 +88,7 @@ output = net(input_var) # input_var可以在任何device上，包括CPU上。新
   - +是否需要 model.to(device)？+ 需要！
 
 由单进程控制多个GPU，所以在一个节点上只需要运行一次就可以创建一个进程。
-*** ~torch.distributed~ 并行
+*** ~torch.distributed~ 启动器
 上面的DataParallel进行数据并行时，使用一个进程来使用单个或多个GPU，若要创建多个进程就
 需要代码并运行多次，很不方便。
 
@@ -242,3 +241,15 @@ python mnist-distributed.py -n 2 -g 4 --nr 0 --epoch 30
 #on node 1
 python mnist-distributed.py -n 2 -g 4 --nr 0 --epoch 30
 #+END_SRC
+** pytorch lightning
+一般一个新的项目需要定义两个文件，一个 ~LightningModule~ 文件，一个 ~Trainer~ 文件。
+[[https://pytorch-lightning.readthedocs.io/en/0.4.9/][这里有许多示例]]。
+*** ~LightningModule~
+~LightningModule~ 是 ~nn.Module~ 的严格超类。它提供了一个与 ~Trainer~ 交互的标准
+界面。要开始自己的项目，可以从示例文件上修改，也可以自己定义 ~LightningModule~ 文件。
+
+自定义的 ~LightningModule~ 文件要实现以下方法[[https://pytorch-lightning.readthedocs.io/en/0.4.9/LightningModule/RequiredTrainerInterface/][（参考这里]]）：
+- 必需的方法：training_step, tng_dataloader, configure_optimizer
+- 可选的方法：validation_step, validation_end, test_step, test_end, val_dataloader
+  test_dataloader, on_save_checkpoint, on_load_checkpoint, update_tng_log_metrics,
+  add_model_specific_args

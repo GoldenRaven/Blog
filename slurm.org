@@ -1,0 +1,8 @@
+* slurm安装与配置记录
+更改ip hosts
+
+/etc/hosts文件中修改
+#+BEGIN_SRC
+192.168.0.132 node001
+192.168.0.106 node002
+#+END_SRC
