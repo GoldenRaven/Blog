@@ -1,0 +1,30 @@
+* 使用本地浏览器打开远程服务器上的jupyter notebook
+To make the connection faster, you can follow below instructions:
+
+- First, make sure you install Jupyter notebook in both remote 
+  (working station in your offcie) and local (your home computer)
+- In remote host, open the terminal, change directory to where
+  you have your notebooks and type:
+
+#+begin_src python
+jupyternotebook--no-browser--port=8889# you should leave the this open
+#+END_SRC
+
+- In your local computer, open MS-DOS cmd (if using Windows) or
+  Unix terminal, then type:
+
+#+begin_src python
+# make sure to change `username` to your real username in remote host
+# change `your_remote_host_name` to your address of your working station
+# Example: ssh -N -f -L localhost:8888:localhost:8889 guest@192.168.0.132
+ssh-N-f-Llocalhost:8888:localhost:8889username@your_remote_host_name
+#+END_SRC
+
+- Now open web browser (google chrome, firefox, ...) and type:
+  ~localhost:8888~
+  you will see your notebooks in your given directory
+- If Token needed, go to remote server, type output of this command:
+
+#+begin_src python
+jupyter notebook list|tail -n 1|cut -d = -f 2|cut -d ' ' -f 1
+#+END_SRC
