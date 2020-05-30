@@ -1,0 +1,73 @@
+* weight of evidence(WOE) and information value(IV)
+[[https://www.listendata.com/2015/03/weight-of-evidence-woe-and-information.html][主要参考此处]]
+
+[[https://www.listendata.com/2019/08/WOE-IV-Continuous-Dependent.html][因变量是连续值时怎么使用WOE和IV?]]
+
+逻辑回归是应用最广泛的二元分类技术之一。WOE和IV在信用评分领域已经被使用了四五十年，
+它们在信用风险建模领域项目（如预测拖欠交款的概率）中作为屏蔽变量（即特征）的标准操作，
+也被用于市场分析模型项目中，如顾客损耗模型，活动反馈模型等。
+
+** 什么是WOE
+WEO是一个自变量对因变量的预测能力的体现，因为发源于信用评分问题，所以表示的是将好/坏
+顾客分开的能力（二元分类）。好顾客：能够偿还借贷；坏顾客：拖欠借贷。
+
+某个变量的第i个bin的WOE为：
+
+WOE_{i} = ln[(Distribution of Goods_{i})/(Distribution of Bads_{i})]
+
+Distribution of Goods_{i} = n_{Good, i}/n_{Good}
+
+Distribution of Bads_{i} = n_{Bad, i}/n_{Bad}
+
+ln为自然对数。
+
+** 如何计算WOE
+- 对于连续变量，将数据分成10组（10个bin/group）
+- 对于分类变量，直接进行下面过程
+- 得到每个bin的正类个数和负类个数
+- 计算每个bin的正类率和负类率
+- 代入公式求比值的自然对数
+
+[[file:images/woe_iv.png]]
+
+** 与WOE相关的术语
+*** Fine Classing（细粒度分组）
+对于连续自变量，新建10到20个bin，并计算woe值和iv值。
+*** Coarse Classing（粗粒度分组）
+将相邻的、WOE相近的bin合并成一个bin。bin越少模型越稳定，可以去除噪声干扰。
+** WOE的用处
+- 对于连续自变量，建立了bin，并用WOE值代替原分类变量？
+- 对于分类自变量，新建了连续WOE值的新连续变量？
+** WOE的使用限制
+- 每个bin至少要有5%的样本数量
+- 每个bin都不能出现正类或负类数量为0情况
+- 不同bin的WOE值要不同（相同的被合并了）
+- WOE值随不同bin，必须是单调变化的
+- 将缺失值，分为一个单独的bin
+** 对于出现正/负类数量为0的情况
+公式中的分子加0.5
+
+WOE'_{i} = ln[(Distribution of Goods_{i})/(Distribution of Bads_{i})]
+
+Distribution of Goods_{i} = n_{Good, i}+0.5/n_{Good}
+
+Distribution of Bads_{i} = n_{Bad, i}+0.5/n_{Bad}
+** 检查以WOE作为标准bining的正确性
+- WOE应该是单调的
+- 在先bining，再WOE变换之后，在被变换的WOE值自变量上进行单变量的逻辑回归拟合，
+  若斜率不为1,或截距不为ln(% of non-events/% of events)，则bining不好。
+** WOE的好处
+- 可以处理离群值
+- 可以处理缺失值，单独分为一组（bin）
+- 可以处理分类变量，不需要dummy variables
+- WOE变换可以建立严格的线性关系（with log odds）
+** 什么是information value(IV)
+IV是预测模型中用来挑选重要变量的最有用的技术之一，它基于重要性对变量进行排序。某个自变量的
+IV定义为：
+
+IV = \sum[ (Distribution of Goods_{i})-(Distribution of Bads_{i}) * WOE_{i}]
+
+[[file:images/iv.png]]
+
+- bin增多时，IV增大
+- IV不能作为更一般的特征选择方法使用，它只被设计成适用于二元逻辑回归的分类（决策边界是线性的）。

@@ -1,4 +1,5 @@
 * 使用本地浏览器打开远程服务器上的jupyter notebook
+- 参考[[https://ljvmiranda921.github.io/notebook/2018/01/31/running-a-jupyter-notebook/][此处]]
 To make the connection faster, you can follow below instructions:
 
 - First, make sure you install Jupyter notebook in both remote 
