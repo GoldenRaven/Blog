@@ -1,7 +1,8 @@
 * ~pandas.cut()~ 函数的用法
 ** 官方doc
 #+BEGIN_EXAMPLE
-cut(x, bins, right:bool=True, labels=None, retbins:bool=False, precision:int=3, include_lowest:bool=False, duplicates:str='raise')
+cut(x, bins, right:bool=True, labels=None, retbins:bool=False, precision:int=3,
+    include_lowest:bool=False, duplicates:str='raise')
     Bin values into discrete intervals.
     
     Use `cut` when you need to segment and sort data values into bins. This
