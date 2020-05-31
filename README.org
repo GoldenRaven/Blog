@@ -1,5 +1,6 @@
 * 欢迎来到我的个人博客
 
+- [[file:2020-05-31_pandas_cut函数.org][2020-05-31_pandas_cut函数]]
 - [[file:2020-05-31_pytorch_distributed_training.org][2020-05-31_pytorch_distributed_training]]
 - [[file:2020-05-30_weight_of_evidence(WOE)_and_information_value(IV).org][2020-05-30_weight_of_evidence(WOE)_and_information_value(IV)]]
 - [[file:2020-05-29_using_remote_jupyter_notebook.org][2020-05-29_using_remote_jupyter_notebook]]
