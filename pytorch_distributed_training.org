@@ -255,8 +255,13 @@ python mnist-distributed.py -n 2 -g 4 --nr 0 --epoch 30
   add_model_specific_args
 
 ** horovod
-[[https://github.com/horovod/horovod]]
+- [[https://github.com/horovod/horovod]]
+- [[https://horovod.readthedocs.io/en/stable/pytorch.html]]
+- [[https://jdhao.github.io/2019/11/01/pytorch_distributed_training/]]
 
-[[https://horovod.readthedocs.io/en/stable/pytorch.html]]
-
-[[https://jdhao.github.io/2019/11/01/pytorch_distributed_training/]]
+** distributed training on slurm cluster
+- [[https://researchcomputing.princeton.edu/python][Using Python on the HPC Clusters]]
+- [[https://researchcomputing.princeton.edu/pytorch][PyTorch on the HPC Clusters]]
+- [[https://towardsdatascience.com/trivial-multi-node-training-with-pytorch-lightning-ff75dfb809bd][Trivial Multi-Node Training With Pytorch-Lightning]]
+- [[https://pytorch-lightning.readthedocs.io/en/latest/multi_gpu.html][MULTI-GPU TRAINING]]
+- [[https://github.com/erikwijmans/skynet-ddp-slurm-example][skynet-ddp-slurm-example]]
