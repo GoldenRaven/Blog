@@ -1,0 +1,53 @@
+* 信用评分模型中的变量选择
+一般通过WOE分析来确定自变量是否对因变量有贡献，并保留有贡献的变量。首先要进行离散化，
+或分箱处理(binning)。常用的binning方法有：equal length(等距), equal freqency
+(等深), optimal binning(最优). optimal binning是属于监督离散化，其他属于无监督
+离散化。
+
+** 最优分箱及求WOE和IV
+optimal binning使用递归划分的方式将连续变量分箱，是一种基于条件推断查找较佳分箱的算法。
+首先选择对连续变量进行最优分段，在连续变量的分布不满足最优分段的要求时，
+再考虑对连续变量进行等距分段。
+
+#+BEGIN_SRC python
+# 定义自动分箱函数，并求woe和IV
+def mono_bin(Y, X, n = 20):
+    r = 0
+    good=Y.sum()
+    bad=Y.count()-good
+    while np.abs(r) < 1:
+        d1 = pd.DataFrame({"X": X, "Y": Y, "Bucket": pd.qcut(X, n)})
+        d2 = d1.groupby('Bucket', as_index = True)
+        r, p = stats.spearmanr(d2.mean().X, d2.mean().Y)
+        n = n - 1
+     d3 = pd.DataFrame(d2.X.min(), columns = ['min'])
+     d3['min']=d2.min().X
+     d3['max'] = d2.max().X
+     d3['sum'] = d2.sum().Y
+     d3['total'] = d2.count().Y
+     d3['rate'] = d2.mean().Y
+     d3['woe']=np.log((d3['rate']/(1-d3['rate']))/(good/bad))
+     d3['goodattribute']=d3['sum']/good
+     d3['badattribute']=(d3['total']-d3['sum'])/bad
+     iv=((d3['goodattribute']-d3['badattribute'])*d3['woe']).sum()
+     d4 = (d3.sort_index(by = 'min')).reset_index(drop=True)
+     print("=" * 60)
+     print(d4)
+     cut=[]
+     cut.append(float('-inf'))
+     for i in range(1,n+1):
+         qua=X.quantile(i/(n+1))
+         cut.append(round(qua,4))
+     cut.append(float('inf'))
+     woe=list(d4['woe'].round(3))
+     return d4,iv,cut,woe
+#+END_SRC
+
+** 变量选择
+选取标准是：丢弃IV小于0.1的变量（特征），因为它们对因变量的预测没有明显贡献；
+同样IV大于0.5的变量是很疑的，一般不使用，丢弃。
+
+在信用评分项目中，在变量选择之后，一般要对筛选的自变量进行WOE变换，
+即用WOE值代替原自变量以输入到模型中（常用逻辑回归，易于理解），进行训练。模型性能常用
+ROC AUC来衡量。再将逻辑回归模型转化为标准评分卡的形式，对每个顾客进行评分。
+这样，一个信用评分项目就完成了。

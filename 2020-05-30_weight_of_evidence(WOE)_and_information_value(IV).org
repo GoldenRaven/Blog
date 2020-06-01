@@ -4,7 +4,7 @@
 [[https://www.listendata.com/2019/08/WOE-IV-Continuous-Dependent.html][因变量是连续值时怎么使用WOE和IV?]]
 
 逻辑回归是应用最广泛的二元分类技术之一。WOE和IV在信用评分领域已经被使用了四五十年，
-它们在信用风险建模领域项目（如预测拖欠交款的概率）中作为屏蔽变量（即特征）的标准操作，
+它们在信用风险建模领域项目（如预测拖欠交款的概率）中作为屏蔽变量（即特征选择）的标准操作，
 也被用于市场分析模型项目中，如顾客损耗模型，活动反馈模型等。
 
 ** 什么是WOE
@@ -44,6 +44,7 @@ ln为自然对数。
 - 不同bin的WOE值要不同（相同的被合并了）
 - WOE值随不同bin，必须是单调变化的
 - 将缺失值，分为一个单独的bin
+- WOE的取值范围是全体实数
 ** 对于出现正/负类数量为0的情况
 公式中的分子加0.5
 
@@ -61,11 +62,13 @@ Distribution of Bads_{i} = n_{Bad, i}+0.5/n_{Bad}
 - 可以处理缺失值，单独分为一组（bin）
 - 可以处理分类变量，不需要dummy variables
 - WOE变换可以建立严格的线性关系（with log odds）
+为什么要用WOE来对自变量做编码呢？主要的两个考虑是：提升模型的预测效果，提高模型的可理解性。
+NP引理证明了，使得ROC达到最优的变换就是计算现有评分的一个WOE，叫做“条件似然比”变换。
 ** 什么是information value(IV)
 IV是预测模型中用来挑选重要变量的最有用的技术之一，它基于重要性对变量进行排序。某个自变量的
 IV定义为：
 
-IV = \sum[ (Distribution of Goods_{i})-(Distribution of Bads_{i}) * WOE_{i}]
+IV = \sum_{i}[ (Distribution of Goods_{i})-(Distribution of Bads_{i}) * WOE_{i}]
 
 [[file:images/iv.png]]
 
