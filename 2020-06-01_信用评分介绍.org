@@ -1,0 +1,63 @@
+* 什么是信用评分？它有什么用处？
+实施有监督的机器学习技术，以进一步了解向客户授予信用并拒绝其信用的过程。此过程称为信用评分，
+这是银行使用的一种广泛的方法，它为每个潜在客户分配300到850的分数，这是850客户可以收到的最高分数。
+信用评分用于评估授予客户信用给放贷人的潜在风险。信用评分基于个人的信用报告，
+该报告会同时考虑数字和分类变量，例如现有信用帐户的状态，信用额度，银行中现有信用的数量等。
+最终，信贷放款人使用该分数来确定将在预定的利率和信贷限额下向哪些客户授予信贷贷款。
+** 信用分介绍
+信用分能反映消费者偿还债务能力，一般由3个数字组成。信用评分有很多方法，不同的模型计算的信
+用分会有几个点的浮动，这取决于不同的使用场景。
+
+最受认可的信用分是FICO分数，由Fair Isaac Company提供。它可以给庄家提供50多种不同的顾
+客信用分数，以供在不同的场景使用。其他的信用评分还有Vantage分，Community Empower分，
+或其他Eperian, Equifax, TransUnion分数。
+
+信用分一般在300到850之间。
+** 信用评分模型
+信用评分模型是用以得出信用分数的统计分析手段，评分的计算基于消费记录，支付频率，债务数量，
+持有信用卡数，信用分余额等。加权之后计算即可得到信用分。
+
+庄家通过信用分来评估借贷的风险，借贷的具体条款和利率等。评分越高，条款就会对越有利。不同的
+模型会侧重不同权重因子。
+
+*** FICO评分模型
+FICO评分模型被认为是最稳定的模型，因为它自1989年以来已经被修订了很多次，以产生更精准的评
+分。
+
+经典FICO评分模型的评分在300到850之间。600以下是poor，740以下是excellent.
+
+[[file:images/credit_score.png]]
+
+主要考虑五个因素：
+- Payment history(35%)
+- Credit utilization(30%)
+- Credit history(15%)
+- Types of credit(10%)
+- New credit(10%)
+*** Vantage Score Model
+2006年三个主要信用评估机构——Experian, Equifax, TransUnion联合推出，以与FICO分数
+在信用评分商业中竞争。
+
+此模型构成为：
+- *High Weight: Payment History (40%)* 延迟支付记录将保持7年。
+- Extreme Weight: Age And Type Of Credit (21%)
+- Extreme Weight: Credit Utilization (20%)
+- Medium Weight: Total Balances (11%)
+- Low Weight: Recent Behavior (5%)
+- Extremely Low Weight: Available Credit (3%)
+*** 其他评分模型
+- TransRisk
+- Experian’s National Equivalency Score
+- Credit Xpert Credit Score
+- CE Credit Score
+- Insurance Score
+- Industry-Specific Credit Scores
+** 两类信用评分模型
+尽管信用评分模型有很多，但基本上只有两类可以被统计验证：用统计评分分析的模型和用评判分析
+的模型。
+
+统计评分模型利用从多个机构获得的许多因子，将这些因子关联起来，并给它们赋予不同权重。模型
+中不包含任何个人对的信用机构的评价。
+
+评判评分模型考虑个人或团体的财务状况、支付记录、银行参考、甚至本机构自己关于个人或团体的
+经验。这种模型在给出信用评分时更依赖于主观判断。
