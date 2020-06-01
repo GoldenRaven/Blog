@@ -1,5 +1,9 @@
 * 欢迎来到我的个人博客
 
+- [[file:TODO.org][TODO]]
+
+- [[2020-06-01_信用评分介绍.org][2020-06-01_信用评分介绍]]
+- [[file:2020-05-31_信用评分模型中的变量选择.org][2020-05-31_信用评分模型中的变量选择]]
 - [[file:2020-05-31_pandas_cut函数.org][2020-05-31_pandas_cut函数]]
 - [[file:2020-05-31_pytorch_distributed_training.org][2020-05-31_pytorch_distributed_training]]
 - [[file:2020-05-30_weight_of_evidence(WOE)_and_information_value(IV).org][2020-05-30_weight_of_evidence(WOE)_and_information_value(IV)]]
