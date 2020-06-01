@@ -40,6 +40,8 @@ FICO评分模型被认为是最稳定的模型，因为它自1989年以来已经
 - Credit history(15%)
 - Types of credit(10%)
 - New credit(10%)
+
+[[file:image/fico.png]]
 *** Vantage Score Model
 2006年三个主要信用评估机构——Experian, Equifax, TransUnion联合推出，以与FICO分数
 在信用评分商业中竞争。
