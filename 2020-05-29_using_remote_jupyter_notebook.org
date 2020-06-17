@@ -8,7 +8,7 @@ To make the connection faster, you can follow below instructions:
   you have your notebooks and type:
 
 #+begin_src python
-jupyternotebook--no-browser--port=8889# you should leave the this open
+jupyter notebook --no-browser --port=8889# you should leave the this open
 #+END_SRC
 
 - In your local computer, open MS-DOS cmd (if using Windows) or
@@ -18,7 +18,7 @@ jupyternotebook--no-browser--port=8889# you should leave the this open
 # make sure to change `username` to your real username in remote host
 # change `your_remote_host_name` to your address of your working station
 # Example: ssh -N -f -L localhost:8888:localhost:8889 guest@192.168.0.132
-ssh-N-f-Llocalhost:8888:localhost:8889username@your_remote_host_name
+ssh -N -f -L localhost:8888:localhost:8889 username@your_remote_host_name
 #+END_SRC
 
 - Now open web browser (google chrome, firefox, ...) and type:
