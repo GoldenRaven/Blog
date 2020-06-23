@@ -1,0 +1,65 @@
+* Python信用风险建模
+** 第十四集 因变量与自变量
+要对PD, LGD, EAD建立模型，它们都是回归模型。
+- PD: 逻辑回归(Logistic regression)
+- LGD: Beta回归(Beta regression)
+- EAD: Beta回归(Beta regression)
+不同模型的因变量：
+- PD: Loan status列
+- LGD: recoveries列
+- EAD: total recovered principal列
+不同自变量的预处理方式不同：
+- 离散变量：categorical, 取有限值
+  + 无序离散变量： ~按离散值处理~
+  + 有序离散变量： ~按离散值处理~
+- 连续变量：数值型，可以取无限个值， ~按离散值处理~
+
+PD模型要求所有的自变量都必须是categorical，这是为了方便呈现和易于转化成评分卡。
+所以预处理就是要把所有变量转化成区间形式。
+
+- 对于离散变量有时要先进行区间合并，再转化成dummy变量。
+- 对于连续变量要先fine classing, 再coarse classing, 再转化成dummy变量
+再将这些dummy变量送入模型中。
+** 第十五集 将数据载入到Python
+** 第十六集 预处理一些连续变量
+首先要确保所有的连续变量是numeric类型。
+** 第十七集 预处理一些离散变量
+#+BEGIN_SRC python
+pd.get_dummies(loan_data['grade'])
+pd.get_dummies(loan_data['grade'], prefix='grade', prefix_sep='_')
+
+loan_data_dummies = [pd.get_dummies(loan_data['grade'], prefix = 'grade', prefix_sep = ':'),
+                     pd.get_dummies(loan_data['sub_grade'], prefix = 'sub_grade', prefix_sep = ':'),
+                     pd.get_dummies(loan_data['home_ownership'], prefix = 'home_ownership', prefix_sep = ':'),
+                     pd.get_dummies(loan_data['verification_status'], prefix = 'verification_status', prefix_sep = ':'),
+                     pd.get_dummies(loan_data['loan_status'], prefix = 'loan_status', prefix_sep = ':'),
+                     pd.get_dummies(loan_data['purpose'], prefix = 'purpose', prefix_sep = ':'),
+                     pd.get_dummies(loan_data['addr_state'], prefix = 'addr_state', prefix_sep = ':'),
+                     pd.get_dummies(loan_data['initial_list_status'], prefix = 'initial_list_status', prefix_sep = ':')]
+loan_data_dummies = pd.concat(loan_data_dummies, axis = 1)
+#+END_SRC
+** 第十八集 预处理缺失值
+** 第十九集 PD模型是什么样的
+好坏定义（违约定义）：一般定义为拖欠还款超过90天。
+[[file:images/logistic0.png]]
+
+[[file:images/logistic.png]]
+
+监管者要求PD模型要有可解释性，所以它的输入变量都是dummy变量。
+** 第二十集 根据好坏定义建立因变量
+~np.where()~ 类似于 ~if~ 语法。用 ~apply~ 也可以实现：
+#+BEGIN_SRC python
+good = ['Fully Paid', 'Current', 'In Grace Period', 'Late (16-30 days)',
+       'Does not meet the credit policy. Status:Fully Paid']
+df['good_bad'] = df.loan_status.apply(lambda x: 1 if x in good else 0)
+#+END_SRC
+** 第二十一集 连续变量离散化，Fine classing, WOE和Coarse classing
+先将连续变量进行初始离散，再计算每个离散区间的WoE。
+
+WoE_i = ln(%good_{i}/%bad_{i})
+
+WoE_{i}的绝对值越大，则这个离散区间区分好坏的能力越强。再根据初始的离散区间构造
+新的区间，这个过程称为Coarse classing.
+
+构造新区间的方法为将WoE值相近的区间合并，以减少区间数量。再将新的区间转化成dummy变量，
+送入PD模型中。

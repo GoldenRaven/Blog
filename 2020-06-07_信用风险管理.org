@@ -18,6 +18,8 @@
 在现代信用风险度量技术中,相对而言,只有违约率度量的技术相对成熟,其他的仍在在探索阶段。
 
 信用风险量化模型见：[[https://www.youtube.com/watch?v=0zybmmpyz4Y#action=share][此处]].
+*** Python信用风险建模
+https://www.bilibili.com/video/BV1UK41157TP
 ** 商业银行信用风险管理的内容
 参考：《我国商业银行信用风险度量和管理研究》，2011年，刘迎春。
 
