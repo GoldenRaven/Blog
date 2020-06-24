@@ -63,3 +63,42 @@ WoE_{i}的绝对值越大，则这个离散区间区分好坏的能力越强。�
 
 构造新区间的方法为将WoE值相近的区间合并，以减少区间数量。再将新的区间转化成dummy变量，
 送入PD模型中。
+** 第二十二集 信息值IV
+反映自变量对因变量的预测能力，可以用来pre-selection，即特征选择。但是本视频不会用IV
+值来选择特征，因为我们将用更高级的方法。但这是个很重要的量，经常用到。
+[[file:images/iv.png]]
+** 第二十三集 分离测试集
+用sklearn的train_test_split
+** 第二十四集 计算grade变量的WoE
+#+BEGIN_SRC python
+# 计算每个grade的分立取值对应的因变量target的个数
+df['good_bad'] = df.groupby('grade', as_index=false)['target'].count()
+#+END_SRC
+** 第二十五集 自动计算离散变量的WoE和IV值
+定义函数来自动处理离散变量，函数原型为：
+#+BEGIN_SRC python
+def woe_discrete(df, discrete_variable_name, target_variable_df):
+    # 计算WoE
+    df['WoE'] = #...
+    # 计算IV
+    df['IV'] = #...
+    return df
+#+END_SRC
+DataFrame df中包含了以字符串命名的离散变量discrete_variable_name， 因变量单独存在以target_variable_df
+命名的DataFrame中。
+** 第二十六集 可视化离散变量的WoE
+定义绘图函数 ~plot_woe(df_woe, rotation_x_label=0)~
+** 第二十七集 根据WoE合并离散变量的分立取值（一）
+合并的依据：？
+- 样本数太少的应该合并到其他组
+- 样本数大的应该单独分为一组
+- WoE值相近的可以分为一个组
+直接将需要合并的离散变量的分立取值对应的dummy变量相加！（不懂为什么？）
+#+BEGIN_SRC python
+# 合并grade A和B
+df['AB'] = sum(df['grade:A'], df['grade:B'])
+#+END_SRC
+
+** 第二十八集 根据WoE合并离散变量的分立取值（二）
+风险管理的保守态度，缺失信息则假设为风险最高。将合并好的分组转化成dummy变量，
+并将WoE最小的分组作为参考，以比较回归模型的能力。
