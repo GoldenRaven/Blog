@@ -163,3 +163,64 @@ odds(Y=1|x=1) / odds(Y=1|x=0) = e^{ln(P(Y=1|x=1)) - ln(P(Y=1|x=0))} = e^{0.24} =
 odds(Y=1|x=1) = 1.27 × odds(Y=1|x=0)
 
 也就是说有高等教育经历的赔率比没有的赔率要高27%，这样逻辑回归的结果就具有可解释性了。
+** 第三十五集 加载数据和选择特征
+？
+** 第三十六集 PD模型求解
+用sklearn的 ~LogisticRegression()~ 拟合训练集。得到 ~reg.coef_~ 和 ~reg.intercept_~ 
+并将它们存在一个DataFrame里。
+** 第三十七集 建立一个有P值的逻辑回归模型
+重新定义逻辑回归，增加p值。[[file:2020-06-25_P值是什么_有什么用.org][p值的定义]]。此处p值计算代码如下：（没看懂！）
+#+BEGIN_SRC python
+# P values for sklearn logistic regression.
+# Class to display p-values for logistic regression in sklearn.
+from sklearn import linear_model
+import scipy.stats as stat
+
+class LogisticRegression_with_p_values:
+    def __init__(self,*args,**kwargs):#,**kwargs):
+        self.model = linear_model.LogisticRegression(*args,**kwargs)#,**args)
+    def fit(self,X,y):
+        self.model.fit(X,y)
+        #### Get p-values for the fitted model ####
+        denom = (2.0 * (1.0 + np.cosh(self.model.decision_function(X))))
+        denom = np.tile(denom,(X.shape[1],1)).T
+        F_ij = np.dot((X / denom).T,X) ## Fisher Information Matrix
+        Cramer_Rao = np.linalg.inv(F_ij) ## Inverse Information Matrix
+        sigma_estimates = np.sqrt(np.diagonal(Cramer_Rao))
+        z_scores = self.model.coef_[0] / sigma_estimates 
+        # z-score for eaach model coefficient
+        p_values = [stat.norm.sf(abs(x)) * 2 for x in z_scores] 
+        ### two tailed test for p-values
+        self.coef_ = self.model.coef_
+        self.intercept_ = self.model.intercept_
+        #self.z_scores = z_scores
+        self.p_values = p_values
+        #self.sigma_estimates = sigma_estimates
+        #self.F_ij = F_ij
+#+END_SRC
+
+看p值来选择变量，只保留那些显著的变量。转化成dummy变量后，原来的一个变量由很多个dummy表示，
+所以除非都不显著或绝大多数都不显著，否则都应该保留。如果p小于0.05,则保留这级dummy变量。
+** 第三十八集 PD模型的系数解释
+以之前预留的参考分组为对照，可以计算同一变量的不同分组的赔率比，如：
+
+odds(Y=1|grade=D) / odds(Y=1|grade=G) = e^{\beta_{D}}
+
+我们假设参考组的拟合系数为0.
+
+odds(Y=1|grade=B) / odds(Y=1|grade=D) = e^{\beta_{B}-\beta_{D}}
+
+这种比较只能对同一变量的不同分组进行，不能对不同的两个变量进行。
+** 第三十九集 PD模型的测试
+将测试集转化成训练集相同的列（先fine classing,再coarse classing, 再丢弃参考分组，
+再计算p值进行变量选择）。
+
+再用逻辑回归来预测X_test
+** 第四十集 计算模型的性能：精度和ROC AUC
+概念及标准：
+[[file:images/ROCAUC.png]]
+** 第四十一集 计算模型的性能：Gini系数和Kolmogorov-Smirnov
+两个在风险建模领域广泛使用的分类衡量指标：Gini系数和Kolmogorov-Smirnov系数。
+
+Gini系数一开始用于在经济学中衡量收入不平等性，此处它用于衡量好/坏借贷者的数量不
+均衡性。
