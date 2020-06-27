@@ -11,8 +11,8 @@
 不同自变量的预处理方式不同：
 - 离散变量：categorical, 取有限值
   + 无序离散变量： ~按离散值处理~
-  + 有序离散变量： ~按离散值处理~
-- 连续变量：数值型，可以取无限个值， ~按离散值处理~
+  + 有序离散变量： ~按连续值处理~
+- 连续变量：数值型，可以取无限个值， ~按连续值处理~
 
 PD模型要求所有的自变量都必须是categorical，这是为了方便呈现和易于转化成评分卡。
 所以预处理就是要把所有变量转化成区间形式。
@@ -204,11 +204,11 @@ class LogisticRegression_with_p_values:
 ** 第三十八集 PD模型的系数解释
 以之前预留的参考分组为对照，可以计算同一变量的不同分组的赔率比，如：
 
-odds(Y=1|grade=D) / odds(Y=1|grade=G) = e^{\beta_{D}}
+odds(Y=1|grade=D) / odds(Y=1|grade=G) = e^{ \beta_{D} }
 
 我们假设参考组的拟合系数为0.
 
-odds(Y=1|grade=B) / odds(Y=1|grade=D) = e^{\beta_{B}-\beta_{D}}
+odds(Y=1|grade=B) / odds(Y=1|grade=D) = e^{ \beta_{B} - \beta_{D} }
 
 这种比较只能对同一变量的不同分组进行，不能对不同的两个变量进行。
 ** 第三十九集 PD模型的测试
