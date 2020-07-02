@@ -169,6 +169,22 @@ odds(Y=1|x=1) = 1.27 × odds(Y=1|x=0)
 对于每个变量必须要删除一个dummy变量，以免陷入所谓的dummy variable trap。
 因为n列的dummy变量可以由自由度为n-1的dummy变量表示，有一个冗余的dummy变量。
 此处将每个变量woe最小的dummy丢弃，作为参考dummy。
+
+选择特征用如下的方法：
+#+BEGIN_SRC python 
+filtered_col = ['grade:A',
+'grade:B',
+'grade:C',
+'grade:D',
+'grade:E',
+'grade:F',
+'grade:G',
+'home_ownership:RENT_OTHER_NONE_ANY',
+'home_ownership:OWN',
+'home_ownership:MORTGAGE']
+df_filtered  = df.reindex(columns=filtered_col)
+#+END_SRC
+丢弃特征用drop方法。
 ** 第三十六集 PD模型求解
 用sklearn的 ~LogisticRegression()~ 拟合训练集。得到 ~reg.coef_~ 和 ~reg.intercept_~ 
 并将它们存在一个DataFrame里。
@@ -228,3 +244,5 @@ odds(Y=1|grade=B) / odds(Y=1|grade=D) = e^{ \beta_{B} - \beta_{D} }
 
 Gini系数一开始用于在经济学中衡量收入不平等性，此处它用于衡量好/坏借贷者的数量不
 均衡性。
+** 第四十三集 建立评分卡
+[[file:images/card.png]]
