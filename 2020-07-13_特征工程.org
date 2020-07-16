@@ -35,7 +35,10 @@ SelectKBest(lambda X, Y: array(map(lambda x:pearsonr(x, Y), X.T)).T, k=2).fit_tr
 **** 卡方检验
 经典的卡方检验是检验定性自变量对定性因变量的相关性。假设自变量有N种取值，
 因变量有M种取值，考虑自变量等于i且因变量等于j的样本频数的观察值与期望的差距，构建统计量。
-chi-square计算公式：\chi^{2} = \sum_{i=1}^{n} (O_{i} - E_{i})^{2} / E_{i}
+chi-square计算公式：
+
+\chi^{2} = \sum_{i=1}^{n} (O_{i} - E_{i})^{2} / E_{i}
+
 p值可通过计算chi-square后查询卡方分布表得出，用于判断H0假设是否成立的依据。
 #+BEGIN_SRC python
 from sklearn.feature_selection import SelectKBest
