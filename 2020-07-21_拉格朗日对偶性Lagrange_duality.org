@@ -1,0 +1,2 @@
+* 拉格朗日对偶性
+主要参考这个CSDN博客：[[https://blog.csdn.net/blackyuanc/article/details/67640844][拉格朗日对偶问题（Lagrange duality）]]，和这个知乎文章：[[https://zhuanlan.zhihu.com/p/31131842][机器学习数学：拉格朗日对偶问题]]。
