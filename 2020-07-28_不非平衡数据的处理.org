@@ -1,0 +1,152 @@
+* 不平衡数据集如何处理？
+
+在学习机器学习的时候，我们遇到的数据集大多是类别平衡的，即数据集中各个类的样本数都很接近。
+但是实际问题中我们遇到的大部分数据集都是不均衡的。不平衡类别使得“准确率”失去意义。
+这是机器学习 (特别是在分类)中一个令人惊讶的常见问题，出现于每个类别的观测样本不成比例的数据集中。
+普通的准确率不再能够可靠地度量性能，这使得模型训练变得更加困难。
+
+不平衡类别出现在多个领域，包括：
+- 欺诈检测
+- 垃圾邮件过滤
+- 疾病筛查
+- SaaS 客户流失
+- 广告点击率
+
+处理数据不平衡的方法主要有重采样、代价敏感学习与集成学习等。
+** 参考文章
+- [[https://wqw547243068.github.io/2019/04/25/Imbalance-Data/][如何处理机器学习中的不平衡类别]]
+- [[https://www.capallen.top/2019/Deal-with-imbalanced-data-in-ML][机器学习中不平衡数据的预处理]]
+- [[https://www.ele.uri.edu/faculty/he/PDFfiles/ImbalancedLearning.pdf][Learning from Imbalanced Data]]
+- [[https://github.com/ZhiningLiu1998/awesome-imbalanced-learning][类别不平衡学习：论文、代码、框架与库]]
+- [[https://github.com/ZhiningLiu1998/self-paced-ensemble][泛用，高效，鲁棒的类别不平衡学习框架]]
+** 上采样少数类别Oversampling
+[[file:images/sampling]]
+
+上采样是从少数类别中随机复制观测样本以增强其信号的过程。下面是详细步骤：
+
+- 首先，我们将每个类别的观测样本分离到不同的 DataFrame 中。
+- 接着，我们将采用放回抽样的方式对少数类别重采样，让样本的数量与多数类别数量相当。
+- 最后，我们将上采样后的少数类别 DataFrame 与原始的多数类别 DataFrame 合并。
+
+#+BEGIN_SRC python
+from sklearn.utils import resample
+#  分离多数和少数类别
+df_majority = df[df.balance==0]
+df_minority = df[df.balance==1]
+
+# 上采样少数类别
+df_minority_upsampled = resample(df_minority,
+                                 replace=True,     # sample with replacement
+                                 n_samples=576,    # to match majority class
+                                 random_state=123) # reproducible results
+
+# 合并多数类别同上采样过的少数类别
+df_upsampled = pd.concat([df_majority, df_minority_upsampled])
+
+# 显示新的类别数量
+df_upsampled.balance.value_counts()
+# 1    576
+# 0    576
+# Name: balance, dtype: int64
+#+END_SRC
+** 下采样多数类别Undersampling
+下采样包括从多数类别中随机地移除观测样本，以防止它的信息主导学习算法。
+其中最常见的试探法是不放回抽样式重采样。这个过程同上采样极为相似。下面是详细步骤：
+
+首先，我们将每个类别的观测样本分离到不同的 DataFrame 中。
+接着，我们将采用不放回抽样来重采样多数类别，让样本的数量与少数类别数量相当。
+最后，我们将下采样后的多数类别 DataFrame 与原始的少数类别 DataFrame 合并。
+以下为代码：
+#+BEGIN_SRC python
+# 分离多数类别和少数类别
+df_majority = df[df.balance==0]
+df_minority = df[df.balance==1]
+
+# 下采样多数类别
+df_majority_downsampled = resample(df_majority,
+                                 replace=False,    # sample without replacement
+                                 n_samples=49,     # to match minority class
+                                 random_state=123) # reproducible results
+
+# Combine minority class with downsampled majority class
+df_downsampled = pd.concat([df_majority_downsampled, df_minority])
+
+# Display new class counts
+df_downsampled.balance.value_counts()
+# 1    49
+# 0    49
+# Name: balance, dtype: int64
+#+END_SRC
+上采样和下采样也可以使用`imbanlanced-learn`库来实现：
+#+BEGIN_SRC python
+from imblearn.under_sampling import RandomUnderSampler 
+from imblearn.over_sampling import RandomOverSampler
+
+#随机下采样
+rus = RandomUnderSampler(random_state=42)
+X_res, y_res = rus.fit_resample(X, y)
+#+END_SRC
+
+** 惩罚算法 (代价敏感学习)
+使用惩罚学习算法来增加对少数类别分类错误的代价。对于这种技术，一个流行的算法是惩罚性-SVM：
+训练时，我们可以使用参数class_weight=’balanced’来减少由于少数类别样本比例不足造成的预测错误。
+
+#+BEGIN_SRC python
+# 训练模型
+clf_3 = SVC(kernel='linear',
+            class_weight='balanced', # penalize
+            probability=True)
+
+clf_3.fit(X, y)
+#+END_SRC
+
+** 数据合成
+随机上采样会反复出现一些样本，而导致过拟合；随机下采样则会造成一定程度的特征丢失，
+虽然这种方式比较简单，但现在计算机的计算能力越来越高，可接受的算法复杂度也越来越高，
+所以我们应该主要考虑模型训练的效果。
+数据合成则是利用已有样本生成更多样本，其中常用的包括：
+- SMOTE，利用KNN生成新数据；
+- SMOTEC，可以合成分类数据，但数据集中至少要包含一条连续数据；如果数据集中全是分类数据的话，
+  可以增加一列全为1的intercept列作为连续数据，合成数据之后，再将该列删除即可。
+- BorderlineSMOTE，与SMOTE的区别是，只为那些周围大部分是大众样本的小众样本生成新样本
+  （因为这些样本往往是边界样本）；
+** 一分类
+这种方法比较适合极不平衡数据，或数据量比较小的数据集。主要方法为OneClassSVM，
+官方文档在[[https://scikit-learn.org/stable/modules/generated/sklearn.svm.OneClassSVM.html][这里]]。
+
+代码实现：
+#+BEGIN_SRC python
+from sklearn import svm
+clf = svm.OneClassSVM(nu=0.2, kernel="rbf", gamma=0.1)
+#+END_SRC
+异常检测感兴趣可以戳这个链接[[https://scikit-learn.org/stable/modules/outlier_detection.html#outlier-detection][Novelty and Outlier Detection]].
+** 基于树的算法
+决策树通常在不平衡数据集上表现良好，因为它们的层级结构允许它们从两个类别去学习。
+在现代应用机器学习中，树集合(随机森林、梯度提升树等) 几乎总是优于单一决策树，
+所以我们将跳过单一决策树直接使用树集合模型.
+** 异常检测
+不修改数据集，而是在思路上将不平衡数据训练问题转化为一分类问题或者异常检测问题
+（少数类就像是存在于多数类中的异常值）。
+
+真正决定哪种策略最适合这个问题，你需要在保留测试集上评估模型。
+** 常见问题
+- 先分离测试集还是先采样？
+  测试集的本质作用是利用历史样本来检验学得的模型的泛化能力，因此测试集必须要代表未来真实的样本分布，
+  不然就丧失了测试集本身应有的作用。
+
+  答案显而易见，应该先划分训练测试集，再在训练集上进行重采样，以解决类别不平衡数据怎么"学"的问题。
+
+- 如何显著地提升模型的表现？
+  可以说，只要数据的可分离性好，不管是平衡的还是不平衡的，也不论不平衡性多强，
+  都很容易获得好的结果，甚至不管使用什么方法来处理不平衡数据，结果都会很近似。
+  因此，在实际的数据挖掘任务中，特征发现工程(特征提取/变量挖掘)才是重中之重。
+
+** 总结
+很多人总认为模型效果不好，肯定是“技术上”或者“方法上”没有尽善尽美。
+其实最关键的还是对任务的理解不到位(脱离业务的数据毫无意义)，没有形成独到的洞见，
+“想不到”可用的有效变量。我曾经也奉行“技术至上”的信条，也实践过很多处理不平衡数据的方法，
+但是最终的结果都差不多。
+
+如果要使用重采样的方法，请务必先划分数据集，再在训练集上进行重采样，
+不然你的测试结果告诉你的都是错误的结论；在实际数据挖掘任务中，
+获得好的模型的王道还是努力理解业务，发掘有效的独立变量。
