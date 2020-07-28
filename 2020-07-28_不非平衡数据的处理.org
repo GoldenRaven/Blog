@@ -16,9 +16,11 @@
 ** 参考文章
 - [[https://wqw547243068.github.io/2019/04/25/Imbalance-Data/][如何处理机器学习中的不平衡类别]]
 - [[https://www.capallen.top/2019/Deal-with-imbalanced-data-in-ML][机器学习中不平衡数据的预处理]]
-- [[https://www.ele.uri.edu/faculty/he/PDFfiles/ImbalancedLearning.pdf][Learning from Imbalanced Data]]
+- [[https://www.ele.uri.edu/faculty/he/PDFfiles/ImbalancedLearning.pdf][文献：Learning from Imbalanced Data]]
 - [[https://github.com/ZhiningLiu1998/awesome-imbalanced-learning][类别不平衡学习：论文、代码、框架与库]]
 - [[https://github.com/ZhiningLiu1998/self-paced-ensemble][泛用，高效，鲁棒的类别不平衡学习框架]]
+- [[https://zhuanlan.zhihu.com/p/66373943][不平衡数据学习综述]]
+
 ** 上采样少数类别Oversampling
 [[file:images/sampling]]
 
