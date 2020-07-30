@@ -1,0 +1,174 @@
+* Pandoc使用方法
+Pandoc是一个普适的文档转换工具。[[https://pandoc.org/demos.html][使用示例见此处]]。
+** 从LaTex到docx
+公式可以转换得很好，但没有公式编号，解决方案有三个：
+- 放弃编号，在word文档中直接自动添加
+- 先将tex文件转换成md文件，在md文件中添加公式编号与索引，如`{#eq:1}`
+- 在tex文件中构造一行三列的列表，将公式和编号放进去，再用pandoc转换成docx文件
+** 使用示例
+To see the output created by each of the commands below, click on the name of the output file:
+
+HTML fragment:
+#+BEGIN_SRC
+pandoc MANUAL.txt -o example1.html
+#+END_SRC
+Standalone HTML file:
+#+BEGIN_SRC
+pandoc -s MANUAL.txt -o example2.html
+#+END_SRC
+HTML with table of contents, CSS, and custom footer:
+#+BEGIN_SRC
+pandoc -s --toc -c pandoc.css -A footer.html MANUAL.txt -o example3.html
+#+END_SRC
+LaTeX:
+#+BEGIN_SRC
+pandoc -s MANUAL.txt -o example4.tex
+#+END_SRC
+From LaTeX to markdown:
+#+BEGIN_SRC
+pandoc -s example4.tex -o example5.text
+#+END_SRC
+reStructuredText:
+#+BEGIN_SRC
+pandoc -s -t rst --toc MANUAL.txt -o example6.text
+#+END_SRC
+Rich text format (RTF):
+#+BEGIN_SRC
+pandoc -s MANUAL.txt -o example7.rtf
+#+END_SRC
+Beamer slide show:
+#+BEGIN_SRC
+pandoc -t beamer SLIDES -o example8.pdf
+#+END_SRC
+DocBook XML:
+#+BEGIN_SRC
+pandoc -s -t docbook MANUAL.txt -o example9.db
+#+END_SRC
+Man page:
+#+BEGIN_SRC
+pandoc -s -t man pandoc.1.md -o example10.1
+#+END_SRC
+ConTeXt:
+#+BEGIN_SRC
+pandoc -s -t context MANUAL.txt -o example11.tex
+#+END_SRC
+Converting a web page to markdown:
+#+BEGIN_SRC
+pandoc -s -r html http://www.gnu.org/software/make/ -o example12.text
+#+END_SRC
+From markdown to PDF:
+#+BEGIN_SRC
+pandoc MANUAL.txt --pdf-engine=xelatex -o example13.pdf
+#+END_SRC
+PDF with numbered sections and a custom LaTeX header:
+#+BEGIN_SRC
+pandoc -N --template=template.tex --variable mainfont="Palatino" --variable sansfont="Helvetica" --variable monofont="Menlo" --variable fontsize=12pt --variable version=2.0 MANUAL.txt --pdf-engine=xelatex --toc -o example14.pdf
+#+END_SRC
+ipynb (Jupyter notebook):
+#+BEGIN_SRC
+pandoc example15.md -o example15.ipynb
+#+END_SRC
+HTML slide shows:
+#+BEGIN_SRC
+pandoc -s --mathml -i -t dzslides SLIDES -o example16a.html
+pandoc -s --webtex -i -t slidy SLIDES -o example16b.html
+pandoc -s --mathjax -i -t revealjs SLIDES -o example16d.html
+#+END_SRC
+TeX math in HTML:
+#+BEGIN_SRC
+pandoc math.text -s -o mathDefault.html
+pandoc math.text -s --mathml  -o mathMathML.html
+pandoc math.text -s --webtex  -o mathWebTeX.html
+pandoc math.text -s --mathjax -o mathMathJax.html
+pandoc math.text -s --katex   -o mathKaTeX.html
+#+END_SRC
+Syntax highlighting of delimited code blocks:
+#+BEGIN_SRC
+pandoc code.text -s --highlight-style pygments -o example18a.html
+pandoc code.text -s --highlight-style kate -o example18b.html
+pandoc code.text -s --highlight-style monochrome -o example18c.html
+pandoc code.text -s --highlight-style espresso -o example18d.html
+pandoc code.text -s --highlight-style haddock -o example18e.html
+pandoc code.text -s --highlight-style tango -o example18f.html
+pandoc code.text -s --highlight-style zenburn -o example18g.html
+#+END_SRC
+GNU Texinfo, converted to info and HTML formats:
+#+BEGIN_SRC
+pandoc MANUAL.txt -s -o example19.texi
+makeinfo --no-validate --force example19.texi -o example19.info
+makeinfo --no-validate --force example19.texi --html -o example19
+#+END_SRC
+OpenDocument XML:
+#+BEGIN_SRC
+pandoc MANUAL.txt -s -t opendocument -o example20.xml
+#+END_SRC
+ODT (OpenDocument Text, readable by OpenOffice):
+#+BEGIN_SRC
+pandoc MANUAL.txt -o example21.odt
+#+END_SRC
+MediaWiki markup:
+#+BEGIN_SRC
+pandoc -s -t mediawiki --toc MANUAL.txt -o example22.wiki
+#+END_SRC
+EPUB ebook:
+#+BEGIN_SRC
+pandoc MANUAL.txt -o MANUAL.epub
+#+END_SRC
+Markdown citations:
+#+BEGIN_SRC
+pandoc -s --bibliography biblio.bib --filter pandoc-citeproc CITATIONS -o example24a.html
+pandoc -s --bibliography biblio.json --filter pandoc-citeproc --csl chicago-fullnote-bibliography.csl CITATIONS -o example24b.html
+pandoc -s --bibliography biblio.yaml --filter pandoc-citeproc --csl ieee.csl CITATIONS -t man -o example24c.1
+#+END_SRC
+Textile writer:
+#+BEGIN_SRC
+pandoc -s MANUAL.txt -t textile -o example25.textile
+#+END_SRC
+Textile reader:
+#+BEGIN_SRC
+pandoc -s example25.textile -f textile -t html -o example26.html
+#+END_SRC
+Org-mode:
+#+BEGIN_SRC
+pandoc -s MANUAL.txt -o example27.org
+#+END_SRC
+AsciiDoc:
+#+BEGIN_SRC
+pandoc -s MANUAL.txt -t asciidoc -o example28.txt
+#+END_SRC
+Word docx:
+#+BEGIN_SRC
+pandoc -s MANUAL.txt -o example29.docx
+#+END_SRC
+LaTeX math to docx:
+#+BEGIN_SRC
+pandoc -s math.tex -o example30.docx
+#+END_SRC
+DocBook to markdown:
+#+BEGIN_SRC
+pandoc -f docbook -t markdown -s howto.xml -o example31.text
+#+END_SRC
+MediaWiki to html5:
+#+BEGIN_SRC
+pandoc -f mediawiki -t html5 -s haskell.wiki -o example32.html
+#+END_SRC
+Custom writer:
+#+BEGIN_SRC
+pandoc -t sample.lua example33.text -o example33.html
+#+END_SRC
+Docx with a reference docx:
+#+BEGIN_SRC
+pandoc --reference-doc twocolumns.docx -o UsersGuide.docx MANUAL.txt
+#+END_SRC
+Docx to markdown, including math:
+#+BEGIN_SRC
+pandoc -s example30.docx -t markdown -o example35.md
+#+END_SRC
+EPUB to plain text:
+#+BEGIN_SRC
+pandoc MANUAL.epub -t plain -o example36.text
+#+END_SRC
+Using a template to produce a table from structured data:
+#+BEGIN_SRC
+pandoc fishwatch.yaml -t rst --template fishtable.rst -o fish.rst # see also the partial species.rst
+#+END_SRC
