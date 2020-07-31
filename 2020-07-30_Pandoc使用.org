@@ -6,6 +6,8 @@ Pandoc是一个普适的文档转换工具。[[https://pandoc.org/demos.html][�
 - 先将tex文件转换成md文件，在md文件中添加公式编号与索引，如`{#eq:1}`
   `$$ y = mx + b $$ {#eq:1}`
 - 在tex文件中构造一行三列的列表，将公式和编号放进去，再用pandoc转换成docx文件
+** 从pdf到docx
+据说最完美的是ABBYY FineReader，但要收费。试用7天，限制100张以内。
 ** 其他场景使用示例
 To see the output created by each of the commands below, click on the name of the output file:
 
