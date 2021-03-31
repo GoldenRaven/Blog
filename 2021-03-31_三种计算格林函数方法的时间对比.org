@@ -1,2 +1,2 @@
 ** 三种计算格林函数方法的时间对比
-[[file:time_report.png]]
+[[file:images/time_report.png]]
