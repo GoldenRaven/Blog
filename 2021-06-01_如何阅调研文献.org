@@ -5,19 +5,19 @@
 - 英文综述或者英文博士论文
 - 本领域核心期刊的文献
 - 本领域牛人或者主要课题组的文献
-  怎么找牛人？
-  + 原则上一般发表论文数量较多的人和课题组就是这行里比较主要的了。
-  + 本领域有哪些比较规模大型的国际会议，而后登陆会议主办者的网站一般都能看到关于会议的invited speaker的名字，做为邀请报告的报告人一般来说都是在该行有头有脸的人物了。
+  - 怎么找牛人？
+    + 原则上一般发表论文数量较多的人和课题组就是这行里比较主要的了。
+    + 本领域有哪些比较规模大型的国际会议，而后登陆会议主办者的网站一般都能看到关于会议的invited speaker的名字，做为邀请报告的报告人一般来说都是在该行有头有脸的人物了。
 - 高引用次数的文章
 - 与自己文章密切相关的前沿文献
 ** 整理文献的方法
 *** 带着问题读文献
 文综核心5问法：
-1）为什么读这个？Why am I reading this?
-2) 作者写这篇文章的目的是什么？What are the authors trying to achieve in writing this?
-3) 作者所述与我的研究的相关之处是什么？What are the authors claiming that is relevant to my work?
-4) 作者的这些阐述的有多可信，为什么呢？How convincing are these claims and why?
-5）这篇文章对我有什么用？In conclusion, what use can I make of it?
+- 为什么读这个？Why am I reading this?
+- 作者写这篇文章的目的是什么？What are the authors trying to achieve in writing this?
+- 作者所述与我的研究的相关之处是什么？What are the authors claiming that is relevant to my work?
+- 作者的这些阐述的有多可信，为什么呢？How convincing are these claims and why?
+- 这篇文章对我有什么用？In conclusion, what use can I make of it?
 *** 写阅读笔记
 阅读文献，总结归纳，字数限定在50以内，回答以下几个问题：
 - 文章的目的（动机、idea）
