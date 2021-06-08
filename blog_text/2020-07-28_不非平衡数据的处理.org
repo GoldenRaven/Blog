@@ -22,7 +22,7 @@
 - [[https://zhuanlan.zhihu.com/p/66373943][不平衡数据学习综述]]
 
 ** 上采样少数类别Oversampling
-[[file:images/sampling]]
+[[file:images/sampling.png]]
 
 上采样是从少数类别中随机复制观测样本以增强其信号的过程。下面是详细步骤：
 
