@@ -1,0 +1,18 @@
+* OOMMF
+OOMMF是使用最广泛的微磁学模拟程序，它是开源的，跨平台的，底层用C++写成。
+** 构架
+- 启动、控制（主界面：tclsh oommf.tcl)
+- OOMMF eXtensible Solver (Oxs)是求解三维方格子问题的引擎。Oxs有两个接口
+  + Oxsii（交互界面）
+  + Boxsi（批量模式，命令行界面）
+- 输入文件是MIF2格式，可以用 ~mifconvert~ 来将1.x格式转换成2.x格式。输入文件里
+  有参数stage，它将整个模拟分成stage个片段。
+** Oxsii
+- 启动：
+  + 通过图形界面mmLaunch
+  + 命令行: tclsh oommf.tcl oxsii
+- 输入：从硬盘读取mif文件
+- 输出：mmDisp等
+** Boxsi
+与Oxsii类似。
+** Oxs_Ext的标准子类
