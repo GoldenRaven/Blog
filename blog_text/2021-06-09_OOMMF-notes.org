@@ -16,3 +16,40 @@ OOMMF是使用最广泛的微磁学模拟程序，它是开源的，跨平台的
 ** Boxsi
 与Oxsii类似。
 ** Oxs_Ext的标准子类
+Oxs由Oxs_Ext (Oxs Extension)对象组成，由MIF2文件中的block进行指定。标准发行版中共有8种：
+- ~atlases~ 定义空间信息：长、宽、厚。可以定义多个空间大小以备后用。
+- ~meshes~ 定义格点离散信息：三个方向上的晶格常数。
+- ~energies~ 定义哈密顿量，有以下几种
+[[file:images/Energies.png]]
+它们需要在单独的block中进行指定。其中依赖格点变化的参数在 ~field object spec~ 条目中指定。
+每一种都有三个标准输出，分别是：
+  + 标量 ~Energy~ (这一项哈密顿量的能量，单位：焦耳 J)
+  + 标量场 ~Energy density~ (能量的空间格点分布，单位：J/m^3)
+  + 矢量场 ~Field~ (pointwise field, 单位：A/m)
+- evolvers
+- drivers
+- scalar field objects
+- vector field objects
+- MIF support classes
+** Evolvers
+共有两种Evolver：
+- time evolver
+  + Oxs_EulerEvolve
+  + Oxs_RungeKuttaEvolve
+  + Oxs_SpinXferEvolve
+- minimization evolver
+  + Oxs_CGEvolve
+Landau-Lifshitz方程：
+[[file:images/LL.png]]
+[[file:images/LLG.png]]
+程序中gamma的单位是m/A/s, alpha没有量纲，默认值分别为2.211e5和0.5。alpha=0.5较实验值略大，但可以更快迟豫。
+** Drivers
+Drivers是控制Evolver行为的上层模块，在Oxs中有两种driver:
+- ~Oxs_TimeDriver~ 控制time Evolvers
+- ~Oxs_MinDriver~ 控制最小化的Evolver
+** 场参数的指定
+- 标量场
+- 矢量场
+** 二维微磁求解器
+mmSolve是oommf二维微磁计算引擎，可以求解定义在二维方格子上的三维自旋问题。这个求解器比前面的Oxs更古老，
+并且可拓展性更差。应尽量用oxs。
