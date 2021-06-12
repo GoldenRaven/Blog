@@ -5,8 +5,11 @@ OOMMF是使用最广泛的微磁学模拟程序，它是开源的，跨平台的
 - OOMMF eXtensible Solver (Oxs)是求解三维方格子问题的引擎。Oxs有两个接口
   + Oxsii（交互界面）
   + Boxsi（批量模式，命令行界面）
-- 输入文件是MIF2格式，可以用 ~mifconvert~ 来将1.x格式转换成2.x格式。输入文件里
-  有参数stage，它将整个模拟分成stage个片段。
+- 输入文件是MIF2格式，可以用 ~mifconvert~ 来将1.x格式转换成2.x格式。
+  #+begin_src
+tclsh oommf.tcl mifconvert [-f|--force] [--format fmt] [-h|--help] [--nostagecheck] [-q|--quiet] [--unsafe] [-v|--version] input_file output_file
+  #+end_src
+  输入文件里有参数stage，它将整个模拟分成stage个片段。
 ** Oxsii
 - 启动：
   + 通过图形界面mmLaunch
@@ -38,11 +41,11 @@ Oxs由Oxs_Ext (Oxs Extension)对象组成，由MIF2文件中的block进行指定
   + Oxs_RungeKuttaEvolve
   + Oxs_SpinXferEvolve
 - minimization evolver
-  + Oxs_CGEvolve
+  + ~Oxs_CGEvolve~ 共轭梯度法
 Landau-Lifshitz方程：
 [[file:images/LL.png]]
 [[file:images/LLG.png]]
-程序中gamma的单位是m/A/s, alpha没有量纲，默认值分别为2.211e5和0.5。alpha=0.5较实验值略大，但可以更快迟豫。
+程序中 gamma 的单位是m/A/s, alpha没有量纲，默认值分别为2.211e5和0.5。 alpha =0.5较实验值略大，但可以更快迟豫。
 ** Drivers
 Drivers是控制Evolver行为的上层模块，在Oxs中有两种driver:
 - ~Oxs_TimeDriver~ 控制time Evolvers
@@ -53,3 +56,7 @@ Drivers是控制Evolver行为的上层模块，在Oxs中有两种driver:
 ** 二维微磁求解器
 mmSolve是oommf二维微磁计算引擎，可以求解定义在二维方格子上的三维自旋问题。这个求解器比前面的Oxs更古老，
 并且可拓展性更差。应尽量用oxs。
+** MIF
+- 1.1版本的输入文件用于二维求解器 ~mmSolve2D~, ~mmProbEd~
+- 2.1和2.2输入文件用于三维求解器
+- 所以版本中的单位都是国际单位制SI
