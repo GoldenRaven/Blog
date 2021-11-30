@@ -1,0 +1,19 @@
+* Archlinux滚动更新遇到no_data错误
+#+begin_src
+$ sudo pacman -Syu
+error: GPGME error: No data
+error: GPGME error: No data
+error: GPGME error: No data
+error: GPGME error: No data
+:: Synchronizing package databases...
+ core                                                               136.9 KiB   820 KiB/s 00:00 [########################################################] 100%
+ extra                                                             1586.5 KiB  1170 KiB/s 00:01 [########################################################] 100%
+ community                                                            5.8 MiB  1659 KiB/s 00:04 [########################################################] 100%
+ multilib                                                           148.5 KiB  1350 KiB/s 00:00 [########################################################] 100%
+error: GPGME error: No data
+error: GPGME error: No data
+error: GPGME error: No data
+error: GPGME error: No data
+error: failed to synchronize all databases (invalid or corrupted database (PGP signature))
+#+end_src
+Archlinux在滚动升级遇到上述错误时，删掉 ~/var/lib/pacman/sync~ 目录即可。

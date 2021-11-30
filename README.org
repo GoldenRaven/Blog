@@ -1,6 +1,7 @@
 * 欢迎来到我的个人博客
 
 - [[file:TODO.org][TODO]]
+- [[2021_11_30_Archlinux滚动更新遇到no_data错误.org][2021_11_30_Archlinux滚动更新遇到no_data错误]]
 - [[file:blog_text/2021-06-09_OOMMF-notes.org][2021-06-09_OOMMF微磁模拟软件学习笔记]]
 - [[file:blog_text/2021-06-01_如何阅调研文献.org][2021-06-01_如何阅调研文献]]
 - [[file:blog_text/2021-05-31_如何阅读整理文献.org][2021-05-31_如何阅读整理文献]]
