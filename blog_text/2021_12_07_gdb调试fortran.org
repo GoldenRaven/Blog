@@ -1,0 +1,24 @@
+* 2021_12_07_gdb调试fortran
+用 ~-g~ 编译fortran得到可执行文件
+#+begin_src sh
+gfortran -g test.f90 -o gdb.x
+#+end_src
+运行gbd进入调试界面
+#+begin_src sh
+gdb gdb.x
+#+end_src
+进入后可按gdb命令来进行调试。命令如下：
+#+begin_src gdb
+l 30        #显示第30行附近的代码
+b 30        #在第30行处加一个断点，程序会运行到30行之前（不运行第30行）
+r  s        #从程序开头运行程序，到下一个断点处
+p i         #打印变量i的值
+info locals #打印所有局域变量和它们的值
+info common #打印所有全局变量和它们的值
+p i/2       #打印运算结果
+b 40        #在第40行加第二个断点
+c           #继续运动程序到下一个断点（第40行）
+l           #显示此位置处的代码
+n           #运行下一行代码并停止
+C-d d       #结束调试
+#+end_src
