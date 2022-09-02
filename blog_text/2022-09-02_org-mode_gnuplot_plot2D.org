@@ -1,0 +1,68 @@
+* 绘制二维函数图像
+** 在emacs org-mode中调用gnuplot的方法
+- 需要安装gnuplot软件
+- 需要安装emacs拓展gnuplot-mode
+- 需要安装emacs拓展gnuplot
+
+然后在 ~.emacs~ 文件中加入
+#+BEGIN_SRC emacs-lisp
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((gnuplot . t)))
+#+END_SRC
+在代码块上按 ~C-c C-c~ 可求解此代码块
+** 以下是一些表格数据与绘图示例
+#+tblname: GW
+|#W/t |  BF          |    ligy-CPA     |   Weimm-CPA|
+|-----+--------------+-----------------+------------|
+|0.01 |  1.99996+00  |    1.99996e+00  |     1.99995|
+|0.5  |  1.87683e+00 |    1.86481e+00  |     1.82801|
+|1    |  1.47196e+00 |    1.40406e+00  |     1.26295|
+|1.5  |  1.23345e+00 |    1.10438e+00  |     0.87089|
+|2    |  1.21154e+00 |    1.01035e+00  |     0.73454|
+|2.5  |  1.20998e+00 |    9.68605e-01  |     0.69185|
+|3    |  1.06570e+00 |    9.02864e-01  |            |
+
+#+begin_src gnuplot :var data=data-table :file output.png
+  gnuplot code goes here
+#+end_src
+
+#+begin_src gnuplot :exports code :file file.png
+reset
+set title "Putting it All Together"
+set xlabel "X"
+set xrange [-8:8]
+set xtics -8,2,8
+set ylabel "Y"
+set yrange [-20:70]
+set ytics -20,10,70
+f(x) = x**2
+g(x) = x**3
+h(x) = 10*sqrt(abs(x))
+plot f(x) w lp lw 1, g(x) w p lw 2, h(x) w l lw 3
+#+end_src
+
+** 二维函数绘图的示例
+#+INCLUDE: "./plot2D.gp" src gnuplot
+
+** 自定义横坐标刻度
+set xtics 命令直接规定了每个刻度的位置和显示的字符。每一个刻度对应三个参数：
+显示字符、刻度位置、刻度等级。刻度等级为 0 时表示主刻度，等级为 1 时表示分刻度。
+对于主刻度（等级为 0 时），表示等级的参数也可以省略不写。各个刻度的参数之间用逗号隔开。
+如：
+#+BEGIN_SRC gnuplot
+set xtics ("初一" 0, "初二" 1, "初三" 2)
+#+END_SRC
+
+** 调整key（即一般而言的legend）的位置
+#+BEGIN_SRC gnuplot
+set k
+unset k
+set k rightbottem
+set k at 2.07,0.76
+#+END_SRC
+
+** 自定义数据文件的分隔符
+#+BEGIN_SRC gnuplot
+set datafile separator {"," | whitespace | "\t"}
+#+END_SRC
