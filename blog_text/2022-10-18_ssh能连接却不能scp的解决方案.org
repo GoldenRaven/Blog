@@ -1,0 +1,9 @@
+** ssh能连接却不能scp
+向日葵内网穿透可以ssh连接，但不能使用scp下载上传
+*** 解决方案
+- bash title过长，修改bashrc的title
+- 使用折中方案
+  + 下载
+  ~ssh -p 20339 ligy@b317b**658.wicp.vip "tar czf - /tmp/1" | tar xzvf - -C ./~
+  + 上传
+  ~tar czf - ./* | ssh -p 20339 ligy@b317b**658.wicp.vip "tar xzf - -C ~/saved_tree"~
