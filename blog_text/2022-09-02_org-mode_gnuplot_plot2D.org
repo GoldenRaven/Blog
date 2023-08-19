@@ -66,3 +66,9 @@ set k at 2.07,0.76
 #+BEGIN_SRC gnuplot
 set datafile separator {"," | whitespace | "\t"}
 #+END_SRC
+
+** test gnuplot in org mode
+
+#+begin_src gnuplot
+set xlabel "test"
+#+end_src
